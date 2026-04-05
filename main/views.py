@@ -1,6 +1,7 @@
 from django.shortcuts import render
 import re
 from collections import Counter
+from django.http import HttpResponse
 
 def counter(request):
     if request.method == 'POST':
@@ -35,3 +36,25 @@ def counter(request):
 
     else:
         return render(request, 'counter.html', {'om': 'active'}) 
+    
+
+def export_txt(request):
+    if request.method == 'POST':
+        text = request.POST.get('text', '')
+        word = request.POST.get('word', '')
+        chars = request.POST.get('chars', '')
+        chars_no_spaces = request.POST.get('chars_no_spaces', '')
+
+        content = f"""Word Counter Results
+====================
+Text:
+{text}
+
+====================
+Words: {word}
+Characters: {chars}
+Characters without spaces: {chars_no_spaces}
+"""
+        response = HttpResponse(content, content_type='text/plain')
+        response['Content-Disposition'] = 'attachment; filename="word_counter_result.txt"'
+        return response    

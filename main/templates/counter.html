@@ -179,6 +179,19 @@
         <textarea name="texttocount" placeholder="Вставь сюда текст...">{{ text }}</textarea>
         <button type="submit">Count →</button>
     </form>
+
+    {% if i %}
+<form action="/export/" method="POST" style="margin-top: 10px;">
+    {% csrf_token %}
+    <input type="hidden" name="text" value="{{ text }}">
+    <input type="hidden" name="word" value="{{ word }}">
+    <input type="hidden" name="chars" value="{{ chars }}">
+    <input type="hidden" name="chars_no_spaces" value="{{ chars_no_spaces }}">
+    <button type="submit" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);">
+        Export to .txt ↓
+    </button>
+</form>
+{% endif %}
 </div>
 </body>
 </html>

@@ -5,4 +5,5 @@ from . import views
 urlpatterns = [
     path('', views.counter, name='counter'),
     path('counter', views.counter, name = 'counter_post'),
+    path('export/', views.export_txt, name='export_txt'),
 ]
