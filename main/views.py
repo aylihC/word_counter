@@ -8,7 +8,7 @@ def counter(request):
 
         if text != '':
             text_clean = re.sub(r'\.(?=[A-ZА-ЯЁ])', ' ', text)
-            words = [w for w in text_clean.lower().split() if re.match(r'^[a-zA-Zа-яА-ЯёЁ]+$', w)]
+            words = [w for w in text_clean.split() if re.search(r'[a-zA-Zа-яА-ЯёЁ]', w)]
             word = len(words)
             chars = len(text)
             word_label = 'word' if word == 1 else 'words'
