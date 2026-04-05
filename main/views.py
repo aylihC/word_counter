@@ -10,7 +10,8 @@ def counter(request):
             text_clean = re.sub(r'\.(?=[A-ZА-ЯЁ])', ' ', text)
             words = [w for w in text_clean.split() if w.strip()]
             word = len(words)
-            chars = len(text.strip().replace(' ', '').replace('\n', '').replace('\r', ''))
+            chars = len(text.strip())
+            chars_no_spaces = len(text.strip().replace(' ', '').replace('\n', '').replace('\r', ''))
             word_label = 'word' if word == 1 else 'words'
             i = True
 
@@ -22,6 +23,7 @@ def counter(request):
                 'word': word,
                 'word_label': word_label,
                 'chars': chars,
+                'chars_no_spaces': chars_no_spaces,
                 'text': text,
                 'i': i,
                 'on': 'active',
