@@ -11,6 +11,7 @@ def counter(request):
             text_clean = re.sub(r"\s+", " ", text_clean).strip()
             words = [w for w in text_clean.lower().split() if re.match(r'^[a-zA-Zа-яА-ЯёЁ]+$', w)]
             word = len(words)
+            chars = len(text)
             word_label = 'word' if word == 1 else 'words'
             i = True
 
@@ -20,6 +21,7 @@ def counter(request):
             return render(request, 'counter.html', {
                 'word': word,
                 'word_label': word_label,
+                'chars': chars,
                 'text': text,
                 'i': i,
                 'on': 'active',
