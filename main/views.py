@@ -7,8 +7,7 @@ def counter(request):
         text = request.POST['texttocount']
 
         if text != '':
-            text_clean = re.sub(r"[^\w\s']", "", text)
-            text_clean = re.sub(r"\s+", " ", text_clean).strip()
+            text_clean = re.sub(r'\.(?=[A-ZА-ЯЁ])', ' ', text)
             words = [w for w in text_clean.lower().split() if re.match(r'^[a-zA-Zа-яА-ЯёЁ]+$', w)]
             word = len(words)
             chars = len(text)
