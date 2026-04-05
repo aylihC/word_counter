@@ -15,7 +15,8 @@ def counter(request):
             i = True
 
             # Топ 5 самых частых слов
-            top_words = Counter(words).most_common(5)
+            words_lower = [w.lower() for w in words]
+            top_words = sorted(Counter(words_lower).most_common(5), key=lambda x: (-x[1], x[0]))
 
             return render(request, 'counter.html', {
                 'word': word,
