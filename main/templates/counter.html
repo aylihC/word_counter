@@ -144,7 +144,7 @@
     <p class="subtitle">Past your text and count words</p>
 
     {% if i %}
-    <div style="display: flex; gap: 15px;">
+   <div style="display: flex; gap: 15px;">
     <div class="result-box" style="flex:1">
         <div class="number">{{ word }}</div>
         <div class="label">{{ word_label }} in the text</div>
@@ -152,6 +152,10 @@
     <div class="result-box" style="flex:1">
         <div class="number">{{ chars }}</div>
         <div class="label">characters</div>
+    </div>
+    <div class="result-box" style="flex:1">
+        <div class="number">{{ chars_no_spaces }}</div>
+        <div class="label">characters without spaces</div>
     </div>
 </div>
     {% endif %}
