@@ -179,12 +179,12 @@
         <textarea name="texttocount" placeholder="Type something...">{{ text }}</textarea>
         <div style="display: flex; gap: 10px; margin-top: 15px;">
     <button type="submit" style="flex: 1; margin-top: 0;">Count →</button>
-    <button type="button" onclick="window.location.href='/?clear=1'" style="
-        flex: 0.4;
-        margin-top: 0;
-        background: rgba(255,255,255,0.07);
-        border: 1px solid rgba(255,255,255,0.15);
-    ">Clear ✕</button>
+    <button type="button" onclick="document.querySelector('textarea').value=''; document.querySelectorAll('.result-box, .top-words').forEach(el => el.style.display='none')" style="
+    flex: 0.4;
+    margin-top: 0;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.15);
+    >Clear ✕</button>
 </div>
     </form>
 
