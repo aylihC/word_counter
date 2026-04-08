@@ -177,7 +177,15 @@
     <form action="" method="POST">
         {% csrf_token %}
         <textarea name="texttocount" placeholder="Вставь сюда текст...">{{ text }}</textarea>
-        <button type="submit">Count →</button>
+        <div style="display: flex; gap: 10px; margin-top: 15px;">
+    <button type="submit" style="flex: 1; margin-top: 0;">Count →</button>
+    <button type="button" onclick="document.querySelector('textarea').value=''" style="
+        flex: 0.4;
+        margin-top: 0;
+        background: rgba(255,255,255,0.07);
+        border: 1px solid rgba(255,255,255,0.15);
+    ">Clear ✕</button>
+</div>
     </form>
 
     {% if i %}
