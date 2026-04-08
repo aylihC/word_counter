@@ -17,8 +17,15 @@ def counter(request):
             i = True
 
             # Топ 5 самых частых слов
-            words_lower = [w.lower() for w in words]
-            top_words = sorted(Counter(words_lower).most_common(5), key=lambda x: (-x[1], x[0]))
+            case_sensitive = request.POST.get('case_sensitive') == '1'
+
+            if case_sensitive:
+                words_counted = words
+            else:
+                words_counted = [w.lower() for w in words]
+
+            top_words = sorted(Counter(words_counted).most_common(5), key=lambda x: (-x[1], x[0]))
+
 
             return render(request, 'counter.html', {
                 'word': word,
@@ -29,6 +36,7 @@ def counter(request):
                 'i': i,
                 'on': 'active',
                 'top_words': top_words,
+                'case_sensitive': case_sensitive,
             })
 
         else:
