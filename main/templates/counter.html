@@ -176,25 +176,15 @@
 
     <form action="" method="POST">
         {% csrf_token %}
-        <textarea name="texttocount" placeholder="Вставь сюда текст...">{{ text }}</textarea>
+        <textarea name="texttocount" placeholder="Type something...">{{ text }}</textarea>
         <div style="display: flex; gap: 10px; margin-top: 15px;">
     <button type="submit" style="flex: 1; margin-top: 0;">Count →</button>
-    <a href="/" style="
+    <button type="button" onclick="window.location.href='/?clear=1'" style="
         flex: 0.4;
-        display: flex;
-        align-items: center;
-        justify-content: center;
         margin-top: 0;
         background: rgba(255,255,255,0.07);
         border: 1px solid rgba(255,255,255,0.15);
-        border-radius: 12px;
-        color: white;
-        text-decoration: none;
-        font-size: 16px;
-        font-weight: 600;
-        padding: 14px;
-        cursor: pointer;
-    ">Clear ✕</a>
+    ">Clear ✕</button>
 </div>
     </form>
 
