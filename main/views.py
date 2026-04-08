@@ -10,6 +10,11 @@ def counter(request):
         if text != '':
             text_clean = re.sub(r'\.(?=[A-ZА-ЯЁ])', ' ', text)
             words = [w for w in text_clean.split() if w.strip()]
+    
+            ignore_numbers = request.POST.get('ignore_numbers') == '1'
+            if ignore_numbers:
+                words = [w for w in words if not re.match(r'^\d+$', w)]
+    
             word = len(words)
             chars = len(text.strip())
             chars_no_spaces = len(text.strip().replace(' ', '').replace('\n', '').replace('\r', ''))
@@ -26,11 +31,6 @@ def counter(request):
 
             top_words = sorted(Counter(words_counted).most_common(5), key=lambda x: (-x[1], x[0]))
 
-            
-            ignore_numbers = request.POST.get('ignore_numbers') == '1'
-
-            if ignore_numbers:
-                words = [w for w in words if not re.match(r'^\d+$', w)]
 
 
             return render(request, 'counter.html', {
