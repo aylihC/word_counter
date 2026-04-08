@@ -26,6 +26,12 @@ def counter(request):
 
             top_words = sorted(Counter(words_counted).most_common(5), key=lambda x: (-x[1], x[0]))
 
+            
+            ignore_numbers = request.POST.get('ignore_numbers') == '1'
+
+            if ignore_numbers:
+                words = [w for w in words if not re.match(r'^\d+$', w)]
+
 
             return render(request, 'counter.html', {
                 'word': word,
@@ -37,6 +43,7 @@ def counter(request):
                 'on': 'active',
                 'top_words': top_words,
                 'case_sensitive': case_sensitive,
+                'ignore_numbers': ignore_numbers,
             })
 
         else:
