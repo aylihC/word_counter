@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', sans-serif;
+            color: white;
+        }
+        .container {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 40px;
+            width: 420px;
+        }
+        h1 {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 30px;
+            background: linear-gradient(90deg, #a78bfa, #60a5fa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        input {
+            width: 100%;
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 12px;
+            padding: 12px 15px;
+            color: white;
+            font-size: 15px;
+            outline: none;
+            margin-bottom: 12px;
+        }
+        input:focus { border-color: #a78bfa; }
+        input::placeholder { color: rgba(255,255,255,0.3); }
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #a78bfa, #60a5fa);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 5px;
+        }
+        .error {
+            background: rgba(255,100,100,0.2);
+            border: 1px solid rgba(255,100,100,0.4);
+            border-radius: 10px;
+            padding: 10px 15px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            color: #ff9999;
+        }
+        .link {
+            text-align: center;
+            margin-top: 20px;
+            color: rgba(255,255,255,0.5);
+            font-size: 14px;
+        }
+        .link a { color: #a78bfa; text-decoration: none; }
+
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .container {
+            animation: fadeInUp 0.5s ease;
+        }    
+
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>✦ Create Account</h1>
+
+
+    <div style="text-align: center; margin-bottom: 20px;">
+        <svg id="cat" width="80" height="80" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+            <!-- Уши -->
+            <polygon points="15,30 25,10 35,30" fill="#a78bfa"/>
+            <polygon points="45,30 55,10 65,30" fill="#a78bfa"/>
+            <polygon points="18,28 25,14 32,28" fill="#f9a8d4"/>
+            <polygon points="48,28 55,14 62,28" fill="#f9a8d4"/>
+            <!-- Голова -->
+            <circle cx="40" cy="45" r="28" fill="#a78bfa"/>
+            <!-- Глаза открытые --> 
+            <g id="eyes-open"></g> 
+                <circle cx="30" cy="40" r="8" fill="white"/>
+                <circle cx="50" cy="40" r="8" fill="white"/>
+                <circle cx="30" cy="41" r="4" fill="#1a1a2e"/>
+                <circle cx="50" cy="41" r="4" fill="#1a1a2e"/>
+                <circle cx="32" cy="39" r="1.5" fill="white"/>
+                <circle cx="52" cy="39" r="1.5" fill="white"/>
+            </g>
+            <!-- Глаза закрытые (лапками) -->
+            <g id="eyes-closed" style="display:none;">
+                <!-- Лапки -->
+                <ellipse cx="30" cy="40" rx="10" ry="8" fill="#7c3aed"/>
+                <ellipse cx="50" cy="40" rx="10" ry="8" fill="#7c3aed"/>
+                <!-- Пальчики левая лапка -->
+                <circle cx="22" cy="36" r="4" fill="#7c3aed"/>
+                <circle cx="26" cy="33" r="4" fill="#7c3aed"/>
+                <circle cx="31" cy="32" r="4" fill="#7c3aed"/>
+                <!-- Пальчики правая лапка -->
+                <circle cx="58" cy="36" r="4" fill="#7c3aed"/>  
+                <circle cx="54" cy="33" r="4" fill="#7c3aed"/>
+                <circle cx="49" cy="32" r="4" fill="#7c3aed"/>
+            </g>
+            <!-- Нос -->
+            <ellipse cx="40" cy="50" rx="3" ry="2" fill="#f9a8d4"/>
+            <!-- Рот -->
+            <path d="M 36 53 Q 40 57 44 53" stroke="#f9a8d4" stroke-width="1.5" fill="none"/>
+            <!-- Усы -->
+            <line x1="15" y1="50" x2="34" y2="52" stroke="white" stroke-width="1" opacity="0.6"/>
+            <line x1="15" y1="54" x2="34" y2="54" stroke="white" stroke-width="1" opacity="0.6"/>
+            <line x1="46" y1="52" x2="65" y2="50" stroke="white" stroke-width="1" opacity="0.6"/>
+            <line x1="46" y1="54" x2="65" y2="54" stroke="white" stroke-width="1" opacity="0.6"/>
+        </svg>    
+    </div>    
+
+
+
+    
+    {% if error %}
+    <div class="error">{{ error }}</div>
+    {% endif %}
+    
+
+    {% if success %}
+    <div style="background: rgba(100,255,100,0.1); border: 1px solid rgba(100,255,100,0.3); border-radius: 10px; padding: 10px 15px; margin-bottom: 15px; font-size: 14px; color: #99ffaa;">
+        {{ success }}    
+    </div>
+    {% endif %}    
+
+
+
+    <form method="POST" action="{% url 'register' %}">
+        {% csrf_token %}
+        <input type="text" name="username" placeholder="Username" required>
+        <input type="email" name="email" placeholder="Email" required>
+        <div style="position: relative;">
+            <input type="password" id="password1" name="password1" placeholder="Password" required style="padding-right: 45px;">
+            <span onclick="togglePassword('password1', this)" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: rgba(255,255,255,0.4); font-size: 18px;">👁</span>
+        </div>   
+
+        <div id="strength-bar" style="height: 4px; border-radius: 4px; margin-bottom: 8px; background: rgba(255,255,255,0.1); transition: all 0.3s;">
+            <div id="strength-fill" style="height: 100%; border-radius: 4px; width: 0%; transition: all 0.3s;"></div>
+        </div>
+        <div id="strength-text" style="font-size: 12px; color: rgba(255,255,255,0.4); margin-bottom: 10px;"></div>    
+
+        <div style="position: relative;">
+            <input type="password" id="password2" name="password2" placeholder="Confirm password" required style="padding-right: 45px;">
+            <span onclick="togglePassword('password2', this)" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: rgba(255,255,255,0.4); font-size: 18px;">👁</span>
+        </div>
+        <div id="match-text" style="font-size: 12px; margin-top: -8px; margin-bottom: 10px;"></div>    
+
+
+        <button type="submit">Create Account →</button>
+    </form>
+    
+    <div class="link">
+        Already have an account? <a href="/login/">Sign in</a>
+    </div>
+</div>
+
+<script>
+function togglePassword(id, el) {
+    const input = document.getElementById(id);
+    if (input.type === 'password') {
+        input.type = 'text';
+        el.style.color = '#a78bfa';
+    } else {
+        input.type = 'password';
+        el.style.color = 'rgba(255,255,255,0.4)';
+    }
+}
+
+
+function updateCat(isPassword) {
+    const open = document.getElementById('eyes-open');
+    const closed = document.getElementById('eyes-closed');
+    if (isPassword) {
+        open.style.display = 'none';
+        closed.style.display = 'block';
+    } else {
+        open.style.display = 'block';
+        closed.style.display = 'none';
+    }
+}
+
+// Следим за полями пароля
+document.getElementById('password1').addEventListener('focus', () => updateCat(true));
+document.getElementById('password1').addEventListener('blur', () => updateCat(false));
+document.getElementById('password2').addEventListener('focus', () => updateCat(true));
+document.getElementById('password2').addEventListener('blur', () => updateCat(false));
+
+// Обновляем при переключении глазка
+const origToggle = togglePassword;
+togglePassword = function(id, el) {
+    origToggle(id, el);
+    const input = document.getElementById(id);
+    updateCat(input.type === 'password');
+}
+
+
+document.getElementById('password1').addEventListener('input', function() {
+    const val = this.value;
+    const fill = document.getElementById('strength-fill');
+    const text = document.getElementById('strength-text');
+
+    let strength = 0;
+    if (val.length >= 8) strength++;
+    if (/[A-Z]/.test(val)) strength++;
+    if (/[0-9]/.test(val)) strength++;
+    if (/[^A-Za-z0-9]/.test(val)) strength++;
+
+    const levels = [
+        { width: '0%', color: 'transparent', label: '' },
+        { width: '25%', color: '#ff4d4d', label: '😟 Too weak' },
+        { width: '50%', color: '#ffaa00', label: '😐 Could be stronger' },
+        { width: '75%', color: '#60a5fa', label: '🙂 Good password' },
+        { width: '100%', color: '#a78bfa', label: '💪 Strong password!' },
+    ];
+
+    fill.style.width = levels[strength].width;
+    fill.style.background = levels[strength].color;
+    text.textContent = levels[strength].label;
+    text.style.color = levels[strength].color;
+});
+
+document.getElementById('password2').addEventListener('input', function() {
+    const p1 = document.getElementById('password1').value;
+    const p2 = this.value;
+    const matchText = document.getElementById('match-text');
+    const input2 = document.getElementById('password2');
+
+    if (p2 === '') {
+        matchText.textContent = '';
+        input2.style.borderColor = 'rgba(255,255,255,0.15)';
+    } else if (p1 === p2) {
+        matchText.textContent = '✅ Passwords match';
+        matchText.style.color = '#99ffaa';
+        input2.style.borderColor = '#99ffaa';
+    } else {
+        matchText.textContent = '❌ Passwords do not match';
+        matchText.style.color = '#ff9999';
+        input2.style.borderColor = '#ff4d4d';
+    }
+});
+</script>
+
+</body>
+</html>
