@@ -148,6 +148,7 @@ Characters without spaces: {chars_no_spaces}
 def register(request):
     if request.method == 'POST':
         username = request.POST['username']
+        print(f"DEBUG USERNAME: '{username}'")
         email = request.POST['email']
         password1 = request.POST['password1']
         password2 = request.POST['password2']
