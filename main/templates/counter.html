@@ -359,8 +359,28 @@
     {% endif %}
 
 
-    <form action="" method="POST">
+    <form action="" method="POST" enctype="multipart/form-data">
     {% csrf_token %}
+    
+    <div class="file-upload-container" style="margin-bottom: 20px; text-align: center;">
+        <label for="text_file" class="file-upload-label">
+            <span class="upload-icon">📄</span>
+            <span>Upload file (.txt)</span>
+            <input type="file"
+                    id="text_file"
+                    name="text_file"
+                    accept=".txt"
+                    style="display: none;"
+                    onchange="showFileName(this)">
+        </label>
+        <div id="file_name" style="margin-top: 10px; color: #a78bfa; font-size: 14px;"></div>
+    </div>
+    
+    <div style="text-align: center; margin: 15px 0; color: rgba(255,255,255,0.3); font-size: 14px;"></div>
+        or insert the text manually
+    </div>    
+
+
     <textarea name="texttocount" placeholder="Type something...">{{ text }}</textarea>
     <div style="display: flex; align-items: center; gap: 8px; margin-top: 12px;">
         <input type="checkbox" name="case_sensitive" id="case_sensitive" value="1" {% if case_sensitive %}checked{% endif %} style="width: 16px; height: 16px; cursor: pointer;">
@@ -387,5 +407,13 @@
 </form>
 {% endif %}
 </div>
+
+<script>
+    function showFileName(input) {
+        const fileName = input.files[0] ? input.files[0].name : '';
+        document.getElementById('file_name').textContent = fileName;
+    }    
+</script>
+
 </body>
 </html>

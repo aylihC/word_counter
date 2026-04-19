@@ -64,7 +64,22 @@ def login_view(request):
 
 def counter(request):
     if request.method == 'POST':
-        text = request.POST['texttocount']
+        # 📁 Обработка загруженного файла
+        uploaded_file = request.FILES.get('text_file')
+        text = ''
+
+        if uploaded_file:
+            # Читаем файл
+            try:
+                text = uploaded_file.read().decode('utf-8')
+            except UnicodeDecodeError:
+                # Пробуем другую кодировку
+                uploaded_file.seek(0)
+                text = uploaded_file.read().decode('latin-1')
+        else:
+            # Если файла нет, берём текст из поля ввода
+            text = request.POST.get('texttocount', '')
+
 
         if text.strip():
             # 1️⃣ Заменяем знаки препинания (кроме точки) на пробелы, чтобы разделять слова
