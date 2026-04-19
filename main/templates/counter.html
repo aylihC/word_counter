@@ -362,19 +362,19 @@
     <form action="" method="POST" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 15px; width: 100%;">
     {% csrf_token %}
     
-    <!-- 📁 Загрузка файла -->
-    <div style="text-align: center; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px dashed rgba(255,255,255,0.2);">
-        <label for="text_file" style="cursor: pointer; display: inline-flex; align-items: center; gap: 10px; padding: 10px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 8px; font-weight: 500;">
+    <!-- 📁 Загрузка файла (компактно) -->
+    <div style="text-align: center; margin-bottom: 10px;">
+            <label for="text_file" style="cursor: pointer; color: #a78bfa; text-decoration: underline; font-size: 14px; display: inline-flex; align-items: center; gap: 5px;">
             📄 Upload file (.txt)
             <input type="file" id="text_file" name="text_file" accept=".txt" style="display: none;" onchange="showFileName(this)">
         </label>
-        <div id="file_name" style="margin-top: 8px; color: #a78bfa; font-size: 13px; min-height: 18px;"></div>
+        <div id="file_name" style="margin-top: 5px; color: rgba(255,255,255,0.5); font-size: 13px;"></div>
     </div>
 
-    <div style="text-align: center; color: rgba(255,255,255,0.4); font-size: 13px;">or insert the text manually</div>
+    <div style="text-align: center; color: rgba(255,255,255,0.3); font-size: 13px;">or insert the text manually</div>
 
     <!-- 📝 Текстовое поле -->
-    <textarea name="texttocount" placeholder="Type something..." style="width: 100%; min-height: 150px; padding: 15px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: white; font-size: 15px; resize: vertical;">{{ text }}</textarea>
+    <textarea name="texttocount" placeholder="Type something..." style="width: 100%; min-height: 150px; padding: 15px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: white; font-size: 15px; resize: vertical; box-sizing: border-box;">{{ text }}</textarea>
 
     <!-- ☑️ Чекбоксы -->
     <div style="display: flex; flex-direction: column; gap: 10px;">
@@ -388,10 +388,17 @@
         </label>
     </div>
 
-    <!-- 🔘 Кнопки -->
-    <div style="display: flex; gap: 10px;">
-        <button type="submit" style="flex: 1; padding: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer;">Count →</button>
-        <button type="button" onclick="document.querySelector('textarea').value=''; document.querySelectorAll('.result-box, .top-words').forEach(el => el.style.display='none')" style="padding: 12px 20px; background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; cursor: pointer;">Clear ✕</button>
+    <!-- 🔘 Кнопки (2/3 и 1/3) -->
+    <div style="display: flex; gap: 10px; margin-top: 5px;">
+        <!-- Count: 2/3 ширины -->
+        <button type="submit" style="flex: 2; padding: 14px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer;">
+            Count →
+        </button>
+        
+        <!-- Clear: 1/3 ширины -->
+        <button type="button" onclick="document.querySelector('textarea').value=''; document.querySelectorAll('.result-box, .top-words, .time-stats-container, .ai-analysis-container').forEach(el => el.style.display='none'); document.getElementById('file_name').textContent='';" style="flex: 1; padding: 14px; background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.7); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer;">
+            Clear ✕
+        </button>
     </div>
 </form>
 
