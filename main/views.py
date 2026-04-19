@@ -67,31 +67,32 @@ def counter(request):
         text = request.POST['texttocount']
 
         if text.strip():
-            text_clean = re.sub(r'\.(?=[A-ZА-ЯЁ])', ' ', text)
-            words = [w for w in text_clean.split() if w.strip()]
+            # 1️⃣ Заменяем знаки препинания (кроме точки) на пробелы, чтобы разделять слова
+            # ! ? , ; : ( ) [ ] { } - — – теперь работают как разделители
+            text_clean = re.sub(r'[!?,;:()\[\]{}\-—–]', ' ', text)
 
+            # 2️⃣ Твоя оригинальная логика для точки:
+            # Разделяем только если после точки идет ЗАГЛАВНАЯ буква
+            text_clean = re.sub(r'\.(?=[A-ZА-ЯЁ])', ' ', text_clean)
+
+            # 3️⃣ Разбиваем текст на список слов
+            words = text_clean.split()
+
+            # 4️⃣ Убираем оставшуюся пунктуацию по краям слов (например, точку в конце "dasas.")
+            words = [re.sub(r'^[^\w]+|[^\w]+$', '', w) for w in words]
+            words = [w for w in words if w]  # Удаляем пустые строки
+
+            # 5️⃣ Игнорирование чисел
             ignore_numbers = request.POST.get('ignore_numbers') == '1'
             if ignore_numbers:
                 words = [w for w in words if not re.match(r'^\d+$', w)]
 
+            # 6️⃣ Регистр
             case_sensitive = request.POST.get('case_sensitive') == '1'
             if not case_sensitive:
                 words = [w.lower() for w in words]
 
-             # ✅ Убираем пунктуацию (! ? , . и т.д.)
-            words = [re.sub(r'[^\w\s]', '', w) for w in words]
-            words = [w for w in words if w]  # Убираем пустые строки   
-
-             # Если включено "Игнорировать цифры"
-            if ignore_numbers:
-                words = [w for w in words if not w.isdigit()] 
-
-            # --- ВАЖНО: Считаем ВСЕ слова ---
-            total_words = len(words)  # ВСЕ слова
-            total_unique = len(set(words))
-            # -------------------------------
-
-            # Стоп-слова (только для топ-слов)
+            # 7️⃣ Стоп-слова (фильтруем только для аналитики)
             stop_words = {
                 'и', 'в', 'на', 'не', 'о', 'по', 'с', 'у', 'до', 'от', 'за', 'под', 'над',
                 'а', 'но', 'или', 'как', 'что', 'это', 'так', 'же', 'ли', 'бы',
@@ -100,25 +101,30 @@ def counter(request):
                 'being', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would',
                 'could', 'should', 'may', 'might', 'must', 'shall', 'can', 'need'
             }
-            
-            # Фильтруем только для топ-слов
             filtered_words = [w for w in words if w.lower() not in stop_words]
-            filtered_unique = len(set(filtered_words))
 
-            # Статистика
+            # 8️⃣ Базовая статистика
+            total_words = len(filtered_words)
+            unique_words = len(set(filtered_words))
             chars = len(text.strip())
             chars_no_spaces = len(text.replace(' ', '').replace('\n', '').replace('\r', ''))
             word_label = 'word' if total_words == 1 else 'words'
 
-            # Топ слов (БЕЗ стоп-слов, но проценты от ВСЕХ слов)
+            # 9️⃣ Топ слов с процентами и правильным склонением time/times
             word_freq = Counter(filtered_words)
             top_words_data = []
             for w, count in word_freq.most_common(10):
-                # Процент считаем от ВСЕХ слов (включая стоп-слова)
                 percent = round((count / total_words * 100), 1) if total_words > 0 else 0
-                top_words_data.append({'word': w, 'count': count, 'percent': percent})
+                # ✅ Исправление грамматики
+                time_label = '1 time' if count == 1 else f'{count} times'
+                top_words_data.append({
+                    'word': w,
+                    'count': count,
+                    'percent': percent,
+                    'time_label': time_label
+                })
 
-            # Сохранение истории
+            # 💾 Сохранение в историю
             if request.user.is_authenticated:
                 from .models import SearchHistory
                 SearchHistory.objects.create(
@@ -129,11 +135,11 @@ def counter(request):
                 )
 
             return render(request, 'counter.html', {
-                'word': total_words,  # ВСЕ слова
+                'word': total_words,
                 'word_label': word_label,
                 'chars': chars,
                 'chars_no_spaces': chars_no_spaces,
-                'unique_words': filtered_unique,  # Уникальные БЕЗ стоп-слов
+                'unique_words': unique_words,
                 'text': text,
                 'top_words': top_words_data,
                 'case_sensitive': case_sensitive,
