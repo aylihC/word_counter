@@ -15,6 +15,7 @@ from django.utils import timezone
 from datetime import timedelta
 from .models import LoginAttempt
 from django_ratelimit.decorators import ratelimit
+from textblob import TextBlob
 
 
 @ratelimit(key='ip', rate='10/m', block=True)
@@ -161,6 +162,35 @@ def counter(request):
             speaking_time = format_time(total_words, WPM_SPEAK)
             # ---------------------------------    
 
+            # --- 🤖 AI Анализ настроения ---
+            try:
+                # Создаем объект TextBlob
+                blob = TextBlob(text)
+                polarity = blob.sentiment.polarity  # От -1 (негатив) до 1 (позитив)
+                subjectivity = blob.sentiment.subjectivity  # От 0 (факт) до 1 (мнение)
+
+                # Определяем настроение
+                if polarity > 0.1:
+                    sentiment_label = "Positive 😊"
+                    sentiment_color = "#10b981"  # Зеленый
+                elif polarity < -0.1:
+                    sentiment_label = "Negative 😔"
+                    sentiment_color = "#ef4444"  # Красный
+                else:
+                    sentiment_label = "Neutral 😐"
+                    sentiment_color = "#f59e0b"  # Желтый
+
+                # Процент субъективности
+                subjectivity_percent = round(subjectivity * 100)
+
+            except Exception as e:
+                # Если ошибка (например, текст не на английском)
+                sentiment_label = "N/A"
+                sentiment_color = "#6b7280"
+                subjectivity_percent = 0
+            # ------------------------------    
+
+
             # 💾 Сохранение в историю
             if request.user.is_authenticated:
                 from .models import SearchHistory
@@ -183,6 +213,9 @@ def counter(request):
                 'ignore_numbers': ignore_numbers,
                 'reading_time': reading_time,
                 'speaking_time': speaking_time,
+                'sentiment_label': sentiment_label,
+                'sentiment_color': sentiment_color,
+                'subjectivity_percent': subjectivity_percent,
             })
         else:
             return render(request, 'counter.html', {'om': 'active'})
