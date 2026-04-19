@@ -78,6 +78,14 @@ def counter(request):
             if not case_sensitive:
                 words = [w.lower() for w in words]
 
+             # ✅ Убираем пунктуацию (! ? , . и т.д.)
+            words = [re.sub(r'[^\w\s]', '', w) for w in words]
+            words = [w for w in words if w]  # Убираем пустые строки   
+
+             # Если включено "Игнорировать цифры"
+            if ignore_numbers:
+                words = [w for w in words if not w.isdigit()] 
+
             # --- ВАЖНО: Считаем ВСЕ слова ---
             total_words = len(words)  # ВСЕ слова
             total_unique = len(set(words))
@@ -139,7 +147,7 @@ def counter(request):
     
 
 
-    
+
 
 def export_txt(request):
     if request.method == 'POST':
