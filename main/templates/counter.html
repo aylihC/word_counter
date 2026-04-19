@@ -142,10 +142,17 @@
 
         .stats-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(2, 1fr); /* 2 колонки */
             gap: 15px;
             margin-bottom: 20px;
             font-size: 14px;
+        }
+
+        /* Для мобильных — 1 колонка */
+        @media (max-width: 640px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
         }
 
         .stat-item {
@@ -268,6 +275,14 @@
             <div class="stat-item">
                 <div class="stat-value">{{ unique_words }}</div>
                 <div class="stat-label">Unique words</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">{{ chars }}</div>
+                <div class="stat-label">Characters</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">{{ chars_no_spaces }}</div>
+                <div class="stat-label">Characters (no spaces)</div>
             </div>
         </div>
 
