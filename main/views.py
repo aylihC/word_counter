@@ -124,6 +124,28 @@ def counter(request):
                     'time_label': time_label
                 })
 
+             # --- ⏱️ Расчет времени чтения ---
+            WPM_READ = 200  # Слов в минуту для чтения
+            WPM_SPEAK = 130 # Слов в минуту для речи
+
+
+             # Расчет минут и секунд
+            def format_time(word_count, wpm):
+                if word_count == 0:
+                    return "0 sec"
+                total_minutes = word_count / wpm
+                minutes = int(total_minutes)
+                seconds = int((total_minutes - minutes) * 60)
+                
+                if minutes > 0:
+                    return f"{minutes} min {seconds} sec"
+                else:
+                    return f"~{seconds} sec"
+                
+            reading_time = format_time(total_words, WPM_READ)
+            speaking_time = format_time(total_words, WPM_SPEAK)
+            # ---------------------------------    
+
             # 💾 Сохранение в историю
             if request.user.is_authenticated:
                 from .models import SearchHistory
@@ -144,6 +166,8 @@ def counter(request):
                 'top_words': top_words_data,
                 'case_sensitive': case_sensitive,
                 'ignore_numbers': ignore_numbers,
+                'reading_time': reading_time,
+                'speaking_time': speaking_time,
             })
         else:
             return render(request, 'counter.html', {'om': 'active'})
