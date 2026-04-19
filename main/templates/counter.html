@@ -139,6 +139,58 @@
             color: #a78bfa;
             font-weight: 600;
         }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .stat-item {
+            background: rgba(255,255,255,0.05);
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #a78bfa;
+        }
+
+        .stat-label {
+            color: rgba(255,255,255,0.6);
+            margin-top: 5px;
+        }
+
+        .word-bar-container {
+            margin-bottom: 15px;
+        }
+
+        .word-bar-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+
+        .word-bar-bg {
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            height: 8px;
+            overflow: hidden;
+        }
+
+        .word-bar-fill {
+            background: linear-gradient(90deg, #8b5cf6, #3b82f6);
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }    
+
     </style>
 </head>
 <body>
@@ -204,16 +256,37 @@
 
 
     {% if top_words %}
-<div class="top-words">
-    <h3>TOP WORDS</h3>
-    {% for word_item, count in top_words %}
-    <div class="word-row">
-        <span class="word-text">{{ word_item }}</span>
-        <span class="word-count">{% if count == 1 %}1 time{% else %}{{ count }} times{% endif %}</span>
+    <div class="top-words">
+        <h3>📊 Word Analysis</h3>
+    
+        <!-- Статистика -->
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-value">{{ word }}</div>
+                <div class="stat-label">Total words</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">{{ unique_words }}</div>
+                <div class="stat-label">Unique words</div>
+            </div>
+        </div>
+
+        <!-- Топ слов с барами -->
+        <div class="word-list">
+            {% for item in top_words %}
+            <div class="word-bar-container">
+                <div class="word-bar-header">
+                    <span class="word-text">{{ item.word }}</span>
+                    <span class="word-count">{{ item.count }} times ({{ item.percent }}%)</span>
+                </div>
+                <div class="word-bar-bg">
+                    <div class="word-bar-fill" style="width: {{ item.percent }}%"></div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
     </div>
-    {% endfor %}
-</div>
-{% endif %}
+    {% endif %}
 
 
     <form action="" method="POST">

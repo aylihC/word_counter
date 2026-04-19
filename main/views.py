@@ -66,60 +66,79 @@ def counter(request):
     if request.method == 'POST':
         text = request.POST['texttocount']
 
-        if text != '':
+        if text.strip():
             text_clean = re.sub(r'\.(?=[A-ZА-ЯЁ])', ' ', text)
             words = [w for w in text_clean.split() if w.strip()]
-    
+
             ignore_numbers = request.POST.get('ignore_numbers') == '1'
             if ignore_numbers:
                 words = [w for w in words if not re.match(r'^\d+$', w)]
-    
-            word = len(words)
-            chars = len(text.strip())
-            chars_no_spaces = len(text.strip().replace(' ', '').replace('\n', '').replace('\r', ''))
-            word_label = 'word' if word == 1 else 'words'
-            i = True
 
-            # Топ 5 самых частых слов
             case_sensitive = request.POST.get('case_sensitive') == '1'
+            if not case_sensitive:
+                words = [w.lower() for w in words]
 
-            if case_sensitive:
-                words_counted = words
-            else:
-                words_counted = [w.lower() for w in words]
+            # --- ВАЖНО: Считаем ВСЕ слова ---
+            total_words = len(words)  # ВСЕ слова
+            total_unique = len(set(words))
+            # -------------------------------
 
-            top_words = sorted(Counter(words_counted).most_common(5), key=lambda x: (-x[1], x[0]))
+            # Стоп-слова (только для топ-слов)
+            stop_words = {
+                'и', 'в', 'на', 'не', 'о', 'по', 'с', 'у', 'до', 'от', 'за', 'под', 'над',
+                'а', 'но', 'или', 'как', 'что', 'это', 'так', 'же', 'ли', 'бы',
+                'the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for',
+                'of', 'with', 'by', 'from', 'is', 'are', 'was', 'were', 'be', 'been',
+                'being', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would',
+                'could', 'should', 'may', 'might', 'must', 'shall', 'can', 'need'
+            }
+            
+            # Фильтруем только для топ-слов
+            filtered_words = [w for w in words if w.lower() not in stop_words]
+            filtered_unique = len(set(filtered_words))
 
+            # Статистика
+            chars = len(text.strip())
+            chars_no_spaces = len(text.replace(' ', '').replace('\n', '').replace('\r', ''))
+            word_label = 'word' if total_words == 1 else 'words'
 
+            # Топ слов (БЕЗ стоп-слов, но проценты от ВСЕХ слов)
+            word_freq = Counter(filtered_words)
+            top_words_data = []
+            for w, count in word_freq.most_common(10):
+                # Процент считаем от ВСЕХ слов (включая стоп-слова)
+                percent = round((count / total_words * 100), 1) if total_words > 0 else 0
+                top_words_data.append({'word': w, 'count': count, 'percent': percent})
+
+            # Сохранение истории
             if request.user.is_authenticated:
                 from .models import SearchHistory
                 SearchHistory.objects.create(
                     user=request.user,
                     text=text,
-                    word_count=word,
+                    word_count=total_words,
                     char_count=chars
                 )
 
-
-
             return render(request, 'counter.html', {
-                'word': word,
+                'word': total_words,  # ВСЕ слова
                 'word_label': word_label,
                 'chars': chars,
                 'chars_no_spaces': chars_no_spaces,
+                'unique_words': filtered_unique,  # Уникальные БЕЗ стоп-слов
                 'text': text,
-                'i': i,
-                'on': 'active',
-                'top_words': top_words,
+                'top_words': top_words_data,
                 'case_sensitive': case_sensitive,
                 'ignore_numbers': ignore_numbers,
             })
-
         else:
-            return render(request, 'counter.html', {'on': 'active'})
+            return render(request, 'counter.html', {'om': 'active'})
 
     else:
-        return render(request, 'counter.html', {'om': 'active'}) 
+        return render(request, 'counter.html', {'om': 'active'})
+    
+
+
     
 
 def export_txt(request):
