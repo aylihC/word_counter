@@ -1,200 +1,15 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Word counter</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        body {
-            min-height: 100vh;
-            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Segoe UI', sans-serif;
-            color: white;
-        }
-
-
-        /* === ШИРОКИЙ КОНТЕЙНЕР === */
-        .container {
-            background: rgba(255,255,255,0.05);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 20px;
-            padding: 30px;
-            width: 950px;
-            max-width: 95%;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.4);
-
-            /* СЕТКА: 2 колонки */
-            display: grid;
-            grid-template-columns: 1.4fr 1fr; /* Левая часть шире */
-            gap: 30px;
-            align-items: start;
-        }
-
-        /* Заголовок на всю ширину */
-        .header-section {
-            grid-column: 1 / -1;
-            text-align: center;
-            position: relative;
-            margin-bottom: 10px;
-        }    
-
-        h1 {
-            text-align: center;
-            font-size: 28px;
-            margin-bottom: 10px;
-            background: linear-gradient(90deg, #a78bfa, #60a5fa);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .subtitle {
-            color: rgba(255,255,255,0.4);
-            font-size: 14px;
-        }
-
-        /* === AI БЕЙДЖ (В УГЛУ) === */
-        .ai-badge {
-            position: absolute;
-            top: 0;
-            right: 0;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 10px;
-            padding: 8px 12px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 13px;
-        }    
-        .ai-mood { font-weight: bold; }
-        .ai-mood.positive { color: #10b981; }
-        .ai-mood.negative { color: #ef4444; }
-        .ai-mood.neutral { color: #f59e0b; }
-
-        /* === ЛЕВАЯ КОЛОНКА (ФОРМА) === */
-        .input-section {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        } 
-        
-        textarea {
-            width: 100%;
-            height: 250px; /* Повыше поле */
-            background: rgba(255,255,255,0.07);
-            border: 1px solid rgba(255,255,255,0.15);
-            border-radius: 12px;
-            padding: 15px;
-            color: white;
-            font-size: 15px;
-            resize: vertical;
-            outline: none;
-        } 
-        textarea:focus { border-color: #a78bfa; } 
-        
-        .file-upload-link { text-align: center; font-size: 13px; }
-        .file-upload-link label { color: #a78bfa; cursor: pointer; text-decoration: underline; }
-
-        .form-options {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            font-size: 14px;
-            color: rgba(255,255,255,0.7);
-        }
-
-        .form-buttons { display: flex; gap: 10px; }
-        .form-buttons button {
-            flex: 1; padding: 12px; border-radius: 8px; font-size: 15px; cursor: pointer; border: none; font-weight: 600;
-        } 
-        .btn-count { background: linear-gradient(135deg, #a78bfa, #60a5fa); color: white; flex: 2; }
-        .btn-clear { background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.1); }
-
-        /* === ПРАВАЯ КОЛОНКА (РЕЗУЛЬТАТЫ) === */
-        .results-section {
-            display: flex;
-            flex-direction: column;
-             gap: 15px;
-             max-height: 550px; /* Чтобы не растягивало страницу бесконечно */
-             overflow-y: auto; /* Скролл, если результатов много */
-             padding-right: 5px; /* Место под скроллбар */
-        }  
-        
-        /* Стилизация скроллбара */
-        .results-section::-webkit-scrollbar { width: 6px; }
-        .results-section::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 3px; }
-        .results-section::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
-
-        .card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 12px;
-            adding: 15px;
-        }    
-
-        .card-title {
-            font-size: 12px;
-            text-transform: uppercase;
-            color: rgba(255,255,255,0.5);
-            margin-bottom: 10px;
-            letter-spacing: 1px;
-        }
-
-        /* Статистика 2x2 */
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .stat-item { background: rgba(0,0,0,0.2); padding: 8px; border-radius: 6px; text-align: center; }
-        .stat-value { font-size: 18px; font-weight: bold; color: #a78bfa; }
-        .stat-label { font-size: 10px; color: rgba(255,255,255,0.5); }
-
-        /* Время */
-        .time-row { display: flex; justify-content: space-between; font-size: 13px; }
-        .time-item span { color: #a78bfa; font-weight: bold; }
-
-        /* Топ слов */
-        .word-bar-container { margin-bottom: 8px; }
-        .word-bar-header { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 3px; }
-        .word-bar-bg { background: rgba(255,255,255,0.1); height: 4px; border-radius: 2px; overflow: hidden; }
-        .word-bar-fill { background: linear-gradient(90deg, #8b5cf6, #3b82f6); height: 100%; }
-
-        /* Адаптив для мобильных */
-        @media (max-width: 800px) {
-            .container {
-                grid-template-columns: 1fr; /* Одна колонка */
-                width: 100%;
-            }
-            .ai-badge { position: relative; margin: 0 auto 15px; justify-content: center; }    
-        }
-
-
-        /* Кнопка Export */
-        .btn-export {
-            width: 100%;
-            padding: 10px;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.15);
-            border-radius: 8px;
-            color: rgba(255,255,255,0.7);
-            font-size: 13px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: all 0.2s;
-        }
-        .btn-export:hover {
-            background: rgba(255,255,255,0.1);
-            border-color: rgba(255,255,255,0.3);
-            color: white;
-        }    
-
-    </style>
+    <!-- Подключаем внешний CSS -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    
 </head>
 <body>
 <div class="container">
@@ -203,6 +18,24 @@
      <div class="header-section">
         <h1>✨ Word counter</h1>
         <p class="subtitle">Fast & simple text analysis</p>
+
+        <!-- 🔥 HOW IT WORKS (СЛЕВА) -->
+        <button type="button" class="how-it-works-btn" onclick="document.getElementById('modal').style.display='flex'">
+            How it works?
+        </button>
+
+
+        <!-- 🔥 АВТОРИЗАЦИЯ (СПРАВА) -->
+        <div class="auth-buttons">
+            {% if user.is_authenticated %}
+                <span style="color: rgba(255,255,255,0.6); font-size: 14px; align-self: center;">{{ user.username }}</span>
+                <a href="/logout/" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; padding: 6px 12px; color: rgba(255,255,255,0.7); text-decoration: none; font-size: 13px;">Log out</a>
+            {% else %}
+                <a href="/login/" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; padding: 6px 12px; color: rgba(255,255,255,0.7); text-decoration: none; font-size: 13px;">Sign in</a>
+                <a href="/register/" style="background: linear-gradient(135deg, #a78bfa, #60a5fa); border-radius: 8px; padding: 6px 12px; color: white; text-decoration: none; font-size: 13px; font-weight: 600;">Sign up</a>
+            {% endif %}
+        </div>
+
 
         <!-- AI Бейдж (показываем только если есть результат) -->
         {% if text and sentiment_label %} 
@@ -214,134 +47,212 @@
         </div>    
         {% endif %}
     </div>   
-    
-    <!-- 2. ЛЕВАЯ КОЛОНКА: ФОРМА -->
-    <div class="input-section"> 
-        <form action="" method="POST" enctype="multipart/form-data">
-            {% csrf_token %}
 
-            <!-- Загрузка файла -->
-            <div class="file-upload-link" style="margin-bottom: 10px;">
-                <label for="text_file">📄 Upload .txt file</label>
-                <input type="file" id="text_file" name="text_file" accept=".txt" style="display: none;" onchange="document.getElementById('file_name').textContent = this.files[0].name">
-                <div id="file_name" style="font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 2px;"></div>
+    <!-- МАКЕТ С РЕЗУЛЬТАТАМИ (2 колонки) -->
+    {% if text %} 
+    <div class="results-layout">
+    
+        <!-- 2. ЛЕВАЯ КОЛОНКА: ФОРМА -->
+        <div class="input-section"> 
+            <form action="" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <!-- Загрузка файла -->
+                <div class="file-upload">
+                    <label for="text_file">📄 Upload .txt file</label>
+                    <input type="file" id="text_file" name="text_file" accept=".txt" style="display: none;" onchange="document.getElementById('file_name').textContent = this.files[0].name">
+                    <div id="file_name"></div>
+                </div>    
+
+
+                <!-- Текстовое поле -->
+                <textarea name="texttocount" placeholder="Paste your text here...">{{ text }}</textarea>
+
+
+                <!-- Чекбоксы -->
+                <div class="form-options">
+                    <label>
+                        <input type="checkbox" name="case_sensitive" value="1" {% if case_sensitive %}checked{% endif %}>
+                        Case sensitive (Hello ≠ hello)
+                    </label>    
+                    <label>
+                        <input type="checkbox" name="ignore_numbers" value="1" {% if ignore_numbers %}checked{% endif %}>
+                        Ignore numbers (123 not counted)
+                    </label>
+                </div>    
+
+            
+                <!-- Кнопки -->
+                <div class="form-buttons">
+                    <button type="submit" class="btn-count">Count →</button>
+                    <button type="button" class="btn-clear" onclick="clearAll()">Clear ✕</button>
+            
+                </div>
+            </form>
+        </div>    
+            
+
+
+
+        <!-- 3. ПРАВАЯ КОЛОНКА: РЕЗУЛЬТАТЫ -->
+        <div class="results-section">
+
+            <!-- Статистика -->
+            <div class="card"> 
+                <div class="card-title">📊 Analysis</div>
+                <div class="stats-grid">
+                    <div class="stat-item"><div class="stat-value">{{ word }}</div><div class="stat-label">Words</div></div>
+                    <div class="stat-item"><div class="stat-value">{{ unique_words }}</div><div class="stat-label">Unique</div></div>
+                    <div class="stat-item"><div class="stat-value">{{ chars }}</div><div class="stat-label">Chars</div></div>
+                    <div class="stat-item"><div class="stat-value">{{ chars_no_spaces }}</div><div class="stat-label">No spaces</div></div>
+                </div>    
+            </div> 
+            
+            <!-- Время -->
+            <div class="card">
+                <div class="card-title">⏱️ Reading & Speaking</div>
+                <div class="time-grid">
+                    <div class="time-stat">
+                        <div class="time-icon">📖</div>
+                        <div class="time-value">{{ reading_time }}</div>
+                        <div class="time-label">Reading</div>
+                    </div> 
+                    <div class="time-stat">
+                        <div class="time-icon">🗣️</div>
+                        <div class="time-value">{{ speaking_time }}</div>   
+                        <div class="time-label">Speaking</div>
+                    </div>    
+                </div>  
             </div>
 
-            <!-- Текстовое поле -->
-            <textarea name="texttocount" placeholder="Paste your text here...">{{ text }}</textarea>
 
-            <!-- Чекбоксы -->
-            <div class="form-options" style="margin-top: 10px;">
-                <label><input type="checkbox" name="case_sensitive" value="1" {% if case_sensitive %}checked{% endif %}> Case sensitive</label>
-                <label><input type="checkbox" name="ignore_numbers" value="1" {% if ignore_numbers %}checked{% endif %}> Ignore numbers</label>
-            </div>   
-            
-            <!-- Кнопки -->
-            <div class="form-buttons" style="margin-top: 15px;">
-                <button type="submit" class="btn-count">Count →</button>
-                <button type="button" class="btn-clear" onclick="
-                    document.querySelector('textarea').value = '';
-                    document.getElementById('file_name').textContent = '';
-                    document.getElementById('text_file').value = '';
-                ">Clear ✕</button>   
-            </div> 
-        </form>    
-    </div>      
-    
-    <!-- 3. ПРАВАЯ КОЛОНКА: РЕЗУЛЬТАТЫ -->
-    <div class="results-section">
-        {% if text %}
-
-        <!-- Блок Word Analysis -->
-        <div class="card">
-            <div class="card-title">📊 Analysis</div>
-            <div class="stats-grid">
-                <div class="stat-item"><div class="stat-value">{{ word }}</div><div class="stat-label">Words</div></div>
-                <div class="stat-item"><div class="stat-value">{{ unique_words }}</div><div class="stat-label">Unique</div></div>
-                <div class="stat-item"><div class="stat-value">{{ chars }}</div><div class="stat-label">Chars</div></div>
-                <div class="stat-item"><div class="stat-value">{{ chars_no_spaces }}</div><div class="stat-label">No spaces</div></div>
-            </div>    
-        </div>  
-        
-        <!-- Блок Time -->
-        <div class="card"> 
-            <div class="card-title">⏱️ Time</div>
-            <div class="time-row">
-                <div>📖 Reading: <span>{{ reading_time }}</span></div>
-                <div>🗣️ Speaking: <span>{{ speaking_time }}</span></div> 
-            </div> 
-        </div>          
-
-        <!-- Блок Top Words -->
-        {% if top_words %} 
-        <div class="card">
-            <div class="card-title">🔝 Top Words</div>
-            <div class="word-list">
+            <!-- Топ слов -->
+            {% if top_words %}
+            <div class="card">
+                <div class="card-title">🔝 Top Words</div>
                 {% for item in top_words %}
-                <div class="word-bar-container">
-                    <div class="word-bar-header">
+                <div class="word-item">
+                    <div class="word-header">
                         <span>{{ item.word }}</span>
                         <span>{{ item.count }} ({{ item.percent }}%)</span>
-                    </div>    
-                    <div class="word-bar-bg"><div class="word-bar-fill" style="width: {{ item.percent }}%"></div></div>
-                </div>    
+                    </div>
+                    <div class="word-bar">
+                        <div class="word-bar-fill" style="width: {{ item.percent }}%"></div>
+                    </div>
+                </div>
                 {% endfor %}
-            </div>  
+            </div>
+            {% endif %} 
+
+
+            <!-- Export -->
+            <form action="/export/" method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="text" value="{{ text }}">
+                <input type="hidden" name="word" value="{{ word }}">
+                <input type="hidden" name="chars" value="{{ chars }}">
+                <input type="hidden" name="chars_no_spaces" value="{{ chars_no_spaces }}">
+                <button type="submit" class="btn-export">📥 Export to .txt</button>
+            </form>
+
         </div>
-        
-        
-        <!-- EXPORT -->
-        <form action="/export/" method="POST">
-            {% csrf_token %}
-            <input type="hidden" name="text" value="{{ text }}"> 
-            <input type="hidden" name="word" value="{{ word }}">
-            <input type="hidden" name="chars" value="{{ chars }}">
-            <input type="hidden" name="chars_no_spaces" value="{{ chars_no_spaces }}">
-            <button type="submit" class="btn-export">
-                📥 Export to .txt
-            </button>  
-        </form>    
-        <!-- КОНЕЦ ЭКСПОРТА -->  
-          
+    </div> 
 
+    <!-- ЕСЛИ НЕТ ТЕКСТА (просто форма) -->
+    {% else %}
+        <div class="input-section" style="max-width: 600px; margin: 0 auto;">
+            <form action="" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <div class="file-upload">
+                    <label for="text_file">📄 Upload .txt file</label>
+                    <input type="file" id="text_file" name="text_file" accept=".txt" style="display: none;" onchange="document.getElementById('file_name').textContent = this.files[0].name">
+                    <div id="file_name"></div>
+                </div>
+
+                <textarea name="texttocount" placeholder="Paste your text here..." style="min-height: 250px;"></textarea>
+
+                <div class="form-options">
+                    <label><input type="checkbox" name="case_sensitive" value="1"> Case sensitive (Hello ≠ hello)</label>
+                    <label><input type="checkbox" name="ignore_numbers" value="1"> Ignore numbers (123 not counted)</label>
+                </div>
+
+                <div class="form-buttons">
+                    <button type="submit" class="btn-count">Count →</button>
+                    <button type="button" class="btn-clear" onclick="clearAll()">Clear ✕</button>
+                       
+                </div>
+            </form>
+        </div>
         {% endif %}
-    </div>  
-</div>      
 
+    </div>    
 
-<button type="button" onclick="document.getElementById('modal').style.display='flex'" style="
-    background: none;
-    border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 20px;
-    color: rgba(255,255,255,0.6);
-    font-size: 13px;
-    padding: 6px 16px;
-    cursor: pointer;
-    margin-bottom: 20px;
-">How it works?</button>
-
-<!-- Модальное окно -->
-<div id="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:1000; align-items:center; justify-content:center;">
-    <div style="background:#1a1a2e; border:1px solid rgba(255,255,255,0.1); border-radius:20px; padding:40px; max-width:480px; width:90%; position:relative;">
-        <button onclick="document.getElementById('modal').style.display='none'" style="position:absolute; top:15px; right:15px; background:none; border:none; color:rgba(255,255,255,0.5); font-size:20px; cursor:pointer;">✕</button>
-        <h2 style="margin-bottom:20px; font-size:20px;">How it works</h2>
-        <p style="color:rgba(255,255,255,0.7); line-height:1.8; font-size:15px;">
-            📝 <b>Paste</b> your text into the field<br><br>
-            🔢 <b>Words</b> - separated by spaces. A capital letter after a dot also starts a new word.<br><br>
-            🔤 <b>Characters</b> - total symbols including spaces<br><br>
-            🔡 <b>Characters without spaces</b> - symbols only, no spaces<br><br>
-            🏆 <b>Top Words</b> - most frequent words, sorted alphabetically when tied<br><br>
-            💾 <b>Export</b> - save your results as a .txt file
-        </p>
+    
+    <!-- МОДАЛЬНОЕ ОКНО -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="document.getElementById('modal').style.display='none'">×</button>
+            <h2 style="margin-bottom: 20px; font-size: 20px;">How it works?</h2>
+            <p style="color: rgba(255,255,255,0.7); line-height: 1.8; font-size: 15px;">
+                <b>Paste</b> your text into the field<br><br>
+                <b>Words</b> - separated by spaces. A capital letter after a dot also starts a new word.<br><br>
+                <b>Characters</b> - total symbols including spaces<br><br>
+                <b>Characters without spaces</b> - symbols only, no spaces<br><br>
+                <b>Top Words</b> - most frequent words, sorted alphabetically when tied<br><br>
+                <b>Export</b> - save your results as a .txt file
+            </p>
+        </div>
     </div>
-</div>
-
 
 <script>
 function showFileName(input) {
     const fileName = input.files[0] ? input.files[0].name : '';
     document.getElementById('file_name').textContent = fileName;
-}    
+}   
+
+function clearAll() {
+    console.log('Очистка началась...');
+    
+    // 1. Очищаем textarea
+    const textarea = document.querySelector('textarea[name="texttocount"]');
+    if (textarea) {
+        textarea.value = '';
+        console.log('✓ Текст очищен');
+    }
+    
+    // 2. Сбрасываем файл
+    const fileInput = document.getElementById('text_file');
+    if (fileInput) {
+        fileInput.value = '';
+        console.log('✓ Файл сброшен');
+    }
+    
+    // 3. Скрываем AI бейдж
+    const aiBadge = document.querySelector('.ai-badge');
+    if (aiBadge) {
+        aiBadge.style.display = 'none';
+        console.log('✓ AI скрыт');
+    }
+    
+    // 4. Скрываем результаты
+    const resultsSection = document.querySelector('.results-section');
+    if (resultsSection) {
+        resultsSection.style.display = 'none';
+        console.log('✓ Результаты скрыты');
+    }
+    
+    // 5. Меняем сетку на 1 колонку
+    const layout = document.querySelector('.results-layout');
+    if (layout) {
+        layout.style.gridTemplateColumns = '1fr';
+        console.log('✓ Сетка изменена');
+    }
+    
+    console.log('Очистка завершена!');
+}
+
+
 </script>
 
 </body>

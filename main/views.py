@@ -1,5 +1,6 @@
 from django.shortcuts import render
 import re
+import os
 from collections import Counter
 from django.http import HttpResponse
 from django.contrib.auth import login, logout, authenticate
@@ -16,6 +17,9 @@ from datetime import timedelta
 from .models import LoginAttempt
 from django_ratelimit.decorators import ratelimit
 from textblob import TextBlob
+from pypdf import PdfReader
+from fpdf import FPDF
+from datetime import datetime
 
 
 @ratelimit(key='ip', rate='10/m', block=True)
@@ -70,15 +74,40 @@ def counter(request):
         text = ''
 
         if uploaded_file:
-            # Читаем файл
-            try:
-                text = uploaded_file.read().decode('utf-8')
-            except UnicodeDecodeError:
-                # Пробуем другую кодировку
-                uploaded_file.seek(0)
-                text = uploaded_file.read().decode('latin-1')
+            file_name = uploaded_file.name.lower()
+
+            # Проверяем тип файла
+            if file_name.endswith('.txt'):
+                # TXT файл
+                try:
+                    text = uploaded_file.read().decode('utf-8')
+                except UnicodeDecodeError:
+                    uploaded_file.seek(0)
+                    text = uploaded_file.read().decode('latin-1')
+
+            elif file_name.endswith('.pdf'):
+                # PDF файл
+                try:
+                    reader = PdfReader(uploaded_file)
+                    text = ""
+                    for page in reader.pages:
+                        extracted_text = page.extract_text()
+                        if extracted_text:
+                            text += extracted_text + "\n"
+                except Exception as e:
+                # Если PDF не читается (защищен паролем или поврежден)
+                    context = {
+                        'error': 'Не удалось прочитать PDF файл. Убедитесь, что он не защищен паролем.'
+                    }
+                    return render(request, 'counter.html', context)
+            else:
+            # Неподдерживаемый формат
+                context = {
+                    'error': 'Поддерживаются только .txt и .pdf файлы.'
+                }
+                return render(request, 'counter.html', context)
         else:
-            # Если файла нет, берём текст из поля ввода
+        # Если файла нет, берём текст из поля ввода
             text = request.POST.get('texttocount', '')
 
 
@@ -120,7 +149,7 @@ def counter(request):
             filtered_words = [w for w in words if w.lower() not in stop_words]
 
             # 8️⃣ Базовая статистика
-            total_words = len(filtered_words)
+            total_words = len(words)
             unique_words = len(set(filtered_words))
             chars = len(text.strip())
             chars_no_spaces = len(text.replace(' ', '').replace('\n', '').replace('\r', ''))
@@ -217,15 +246,10 @@ def counter(request):
                 'sentiment_color': sentiment_color,
                 'subjectivity_percent': subjectivity_percent,
             })
-        else:
-            return render(request, 'counter.html', {'om': 'active'})
-
     else:
         return render(request, 'counter.html', {'om': 'active'})
+
     
-
-
-
 
 def export_txt(request):
     if request.method == 'POST':
