@@ -23,6 +23,7 @@ from io import BytesIO
 from datetime import datetime
 
 
+
 @ratelimit(key='ip', rate='10/m', block=True)
 def login_view(request):
     if request.method == 'POST':
