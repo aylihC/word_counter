@@ -19,6 +19,7 @@ from django_ratelimit.decorators import ratelimit
 from textblob import TextBlob
 from pypdf import PdfReader
 from fpdf import FPDF
+from io import BytesIO
 from datetime import datetime
 
 
@@ -272,6 +273,120 @@ Characters without spaces: {chars_no_spaces}
         response['Content-Disposition'] = 'attachment; filename="word_counter_result.txt"'
         return response    
     
+
+
+def export_pdf(request):
+    if request.method == 'POST':
+        try:
+            # Получаем все данные
+            text = request.POST.get('text', '')
+            word_count = request.POST.get('word', '0')
+            unique_words = request.POST.get('unique_words', '0')
+            chars = request.POST.get('chars', '0')
+            chars_no_spaces = request.POST.get('chars_no_spaces', '0')
+            reading_time = request.POST.get('reading_time', '0')
+            speaking_time = request.POST.get('speaking_time', '0')
+            sentiment_label = request.POST.get('sentiment_label', 'N/A')
+            top_words = request.POST.get('top_words', '')
+            
+            # === УДАЛЯЕМ ЭМОДЗИ ===
+            emoji_pattern = re.compile("["
+                u"\U0001F600-\U0001F64F"  # emoticons
+                u"\U0001F300-\U0001F5FF"  # symbols & pictographs
+                u"\U0001F680-\U0001F6FF"  # transport & map symbols
+                u"\U0001F1E0-\U0001F1FF"  # flags
+                u"\U00002702-\U000027B0"
+                u"\U000024C2-\U0001F251"
+                "]+", flags=re.UNICODE)
+            
+            text = emoji_pattern.sub(r'', text)
+            sentiment_label = emoji_pattern.sub(r'', sentiment_label)
+            # ======================
+            
+            buffer = BytesIO()
+            pdf = FPDF()
+            pdf.add_page()
+            
+            # ЗАГОЛОВОК
+            pdf.set_font("Helvetica", size=18, style='B')
+            pdf.set_text_color(100, 80, 180)
+            pdf.cell(0, 15, "Word Counter Analysis", align='C')
+            pdf.ln(20)
+            
+            # СТАТИСТИКА
+            pdf.set_font("Helvetica", size=12, style='B')
+            pdf.set_text_color(0, 0, 0)
+            
+            pdf.set_fill_color(240, 240, 250)
+            pdf.cell(90, 15, f"Total Words: {word_count}", border=1, fill=True)
+            pdf.cell(0, 15, f"Unique Words: {unique_words}", border=1, fill=True)
+            pdf.ln(15)
+            
+            pdf.cell(90, 15, f"Characters: {chars}", border=1, fill=True)
+            pdf.cell(0, 15, f"Without Spaces: {chars_no_spaces}", border=1, fill=True)
+            pdf.ln(20)
+            
+            # ВРЕМЯ
+            pdf.set_font("Helvetica", size=14, style='B')
+            pdf.cell(0, 10, "Reading & Speaking Time:", border=0)
+            pdf.ln(8)
+            
+            pdf.set_font("Helvetica", size=12)
+            pdf.cell(0, 10, f"Reading: {reading_time}")
+            pdf.ln(8)  # Переход на новую строку
+            pdf.cell(0, 10, f"Speaking: {speaking_time}")
+            pdf.ln(15)
+            
+            # НАСТРОЕНИЕ
+            pdf.set_font("Helvetica", size=14, style='B')
+            pdf.cell(0, 10, f"Sentiment: {sentiment_label}", border=0)
+            pdf.ln(15)
+            
+            # TOP WORDS
+            pdf.set_font("Helvetica", size=14, style='B')
+            pdf.cell(0, 10, "Top Words:", border=0)
+            pdf.ln(8)
+            
+            pdf.set_font("Helvetica", size=10)
+            if top_words:
+                for word_line in top_words.split('\n')[:10]:
+                    pdf.cell(0, 6, word_line)
+                    pdf.ln(6)
+            pdf.ln(10)
+            
+            # ТЕКСТ
+            pdf.set_font("Helvetica", size=12, style='B')
+            pdf.cell(0, 10, "Text Content:", border=0)
+            pdf.ln(8)
+            
+            pdf.set_font("Helvetica", size=10)
+            safe_text = text.encode('latin-1', errors='replace').decode('latin-1')
+            if len(safe_text) > 2000:
+                safe_text = safe_text[:2000] + "..."
+            pdf.multi_cell(0, 6, safe_text)
+            
+            # Сохранение
+            pdf_bytes = pdf.output(dest='S')
+            if isinstance(pdf_bytes, str):
+                pdf_bytes = pdf_bytes.encode('latin-1')
+            
+            buffer.write(pdf_bytes)
+            buffer.seek(0)
+            
+            response = HttpResponse(buffer.getvalue(), content_type='application/pdf')
+            response['Content-Disposition'] = 'attachment; filename="word_analysis.pdf"'
+            return response
+            
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            return render(request, 'counter.html', {
+                'error': f'Ошибка PDF: {str(e)}'
+            })
+    
+    return redirect('counter')
+
+
 
 @ratelimit(key='ip', rate='5/m', block=True)
 def register(request):

@@ -1,0 +1,255 @@
+/* === МОБИЛЬНАЯ АДАПТАЦИЯ === */
+@media (max-width: 900px) {
+    
+    /* Уменьшаем отступы контейнера */
+    .container {
+        padding: 20px 15px;
+        border-radius: 20px;
+    }
+    
+    /* === ШАПКА - ИСПРАВЛЕНИЕ НАЛОЖЕНИЯ === */
+    .header-section {
+        margin-bottom: 20px;
+        padding-top: 60px; /* Место для кнопок сверху */
+    }
+    
+    h1 {
+        font-size: 26px;
+        margin-bottom: 6px;
+    }
+    
+    .subtitle {
+        font-size: 13px;
+        margin-bottom: 10px;
+    }
+    
+    /* Кнопки в шапке - переносим под заголовок */
+    .how-it-works-btn {
+        position: static; /* Убираем абсолютное позиционирование */
+        display: inline-block;
+        margin-bottom: 10px;
+        font-size: 12px;
+        padding: 6px 12px;
+    }
+    
+    .auth-buttons {
+        position: static; /* Убираем абсолютное позиционирование */
+        display: flex;
+        gap: 8px;
+        margin-bottom: 15px;
+        justify-content: center;
+    }
+    
+    .auth-buttons a {
+        font-size: 12px;
+        padding: 6px 12px;
+    }
+    
+    /* AI Badge - по центру под кнопками */
+    .ai-badge {
+        margin-top: 10px;
+        font-size: 12px;
+        padding: 6px 10px;
+    }
+    
+    /* === ДВУХКОЛОНОЧНЫЙ МАКЕТ - ОДНА КОЛОНКА === */
+    .results-layout {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    /* Правая колонка - без фиксированной высоты */
+    .results-section {
+        max-height: none;
+        overflow-y: visible;
+        padding-right: 0;
+    }
+    
+    /* === ФОРМА === */
+    textarea {
+        min-height: 150px;
+        font-size: 14px;
+        padding: 12px;
+    }
+    
+    .file-upload {
+        padding: 8px;
+        margin-bottom: 8px;
+    }
+    
+    .file-upload label {
+        font-size: 13px;
+    }
+    
+    .form-options {
+        gap: 8px;
+        font-size: 13px;
+    }
+    
+    .form-options label {
+        font-size: 13px;
+    }
+    
+    .form-options input[type="checkbox"] {
+        width: 14px;
+        height: 14px;
+    }
+    
+    /* Кнопки Count и Clear */
+    .form-buttons {
+        flex-direction: row;
+        gap: 10px;
+    }
+    
+    .form-buttons button {
+        flex: 1;
+        padding: 14px;
+        font-size: 15px;
+    }
+    
+    .btn-count {
+        flex: 1.5;
+    }
+    
+    /* === КАРТОЧКИ РЕЗУЛЬТАТОВ === */
+    .card {
+        padding: 12px;
+    }
+    
+    .card-title {
+        font-size: 10px;
+        margin-bottom: 10px;
+    }
+    
+    /* Статистика 2x2 */
+    .stats-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+    }
+    
+    .stat-item {
+        padding: 10px;
+    }
+    
+    .stat-value {
+        font-size: 18px;
+    }
+    
+    .stat-label {
+        font-size: 10px;
+    }
+    
+    /* Время */
+    .time-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+    
+    .time-stat {
+        padding: 12px 10px;
+    }
+    
+    .time-icon {
+        font-size: 20px;
+        margin-bottom: 6px;
+    }
+    
+    .time-value {
+        font-size: 16px;
+    }
+    
+    .time-label {
+        font-size: 10px;
+    }
+    
+    /* Top Words */
+    .word-header {
+        font-size: 11px;
+    }
+    
+    /* === ЭКСПОРТ === */
+    .export-bar {
+        flex-direction: column;
+        border-radius: 10px;
+    }
+    
+    .export-bar form {
+        width: 100%;
+    }
+    
+    .export-bar .btn-export {
+        padding: 12px;
+        font-size: 13px;
+        border-right: none !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    }
+    
+    .export-bar .btn-export:last-child {
+        border-bottom: none;
+    }
+    
+    /* === МОДАЛЬНОЕ ОКНО === */
+    .modal-content {
+        margin: 15px;
+        padding: 25px 20px;
+        max-width: calc(100% - 30px);
+    }
+    
+    .modal-content h2 {
+        font-size: 18px;
+        margin-bottom: 15px;
+    }
+    
+    .modal-content p {
+        font-size: 14px;
+        line-height: 1.7;
+    }
+    
+    .modal-close {
+        top: 10px;
+        right: 10px;
+        font-size: 22px;
+    }
+}
+
+/* === ОЧЕНЬ МАЛЕНЬКИЕ ЭКРАНЫ (менее 480px) === */
+@media (max-width: 480px) {
+    
+    h1 {
+        font-size: 22px;
+    }
+    
+    .subtitle {
+        font-size: 12px;
+    }
+    
+    .container {
+        padding: 15px 12px;
+    }
+    
+    /* Статистика - можно сделать в 1 колонку если нужно */
+    .stats-grid {
+        grid-template-columns: 1fr 1fr; /* Оставляем 2 для наглядности */
+    }
+    
+    .stat-value {
+        font-size: 16px;
+    }
+    
+    .stat-label {
+        font-size: 9px;
+    }
+    
+    /* Кнопки Count/Clear - друг под другом */
+    .form-buttons {
+        flex-direction: column;
+    }
+    
+    .form-buttons button {
+        width: 100%;
+    }
+    
+    .btn-count {
+        flex: none;
+    }
+}
