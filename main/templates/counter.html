@@ -51,171 +51,139 @@
         {% endif %}
     </div>   
 
-    <!-- МАКЕТ С РЕЗУЛЬТАТАМИ (2 колонки) -->
-    {% if text %} 
-    <div class="results-layout">
-    
-        <!-- 2. ЛЕВАЯ КОЛОНКА: ФОРМА -->
-        <div class="input-section"> 
-            <form action="" method="POST" enctype="multipart/form-data">
-                {% csrf_token %}
+<!-- МАКЕТ (ОБЩИЙ КОНТЕЙНЕР) -->
+<div class="results-layout {% if text %}has-results{% endif %}">
 
-                <!-- Загрузка файла -->
-                <div class="file-upload">
-                    <label for="text_file">📄 Upload .txt file</label>
-                    <input type="file" id="text_file" name="text_file" accept=".txt" style="display: none;" onchange="document.getElementById('file_name').textContent = this.files[0].name">
-                    <div id="file_name"></div>
-                </div>    
+<!-- ЛЕВАЯ КОЛОНКА: ФОРМА (ВСЕГДА ВИДНА) -->
+<div class="input-section">
+    <form action="" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
 
-
-                <!-- Текстовое поле -->
-                <textarea name="texttocount" placeholder="Paste your text here...">{{ text }}</textarea>
-
-
-                <!-- Чекбоксы -->
-                <div class="form-options">
-                    <label>
-                        <input type="checkbox" name="case_sensitive" value="1" {% if case_sensitive %}checked{% endif %}>
-                        Case sensitive (Hello ≠ hello)
-                    </label>    
-                    <label>
-                        <input type="checkbox" name="ignore_numbers" value="1" {% if ignore_numbers %}checked{% endif %}>
-                        Ignore numbers (123 not counted)
-                    </label>
-                </div>    
-
-            
-                <!-- Кнопки -->
-                <div class="form-buttons">
-                    <button type="submit" class="btn-count">Count →</button>
-                    <button type="button" class="btn-clear" onclick="clearAll()">Clear ✕</button>
-            
-                </div>
-            </form>
-        </div>    
-            
-
-
-
-        <!-- 3. ПРАВАЯ КОЛОНКА: РЕЗУЛЬТАТЫ -->
-        <div class="results-section">
-
-            <!-- Статистика -->
-            <div class="card"> 
-                <div class="card-title">📊 Analysis</div>
-                <div class="stats-grid">
-                    <div class="stat-item"><div class="stat-value">{{ word }}</div><div class="stat-label">Words</div></div>
-                    <div class="stat-item"><div class="stat-value">{{ unique_words }}</div><div class="stat-label">Unique</div></div>
-                    <div class="stat-item"><div class="stat-value">{{ chars }}</div><div class="stat-label">Chars</div></div>
-                    <div class="stat-item"><div class="stat-value">{{ chars_no_spaces }}</div><div class="stat-label">No spaces</div></div>
-                </div>    
-            </div> 
-            
-            <!-- Время -->
-            <div class="card">
-                <div class="card-title">⏱️ Reading & Speaking</div>
-                <div class="time-grid">
-                    <div class="time-stat">
-                        <div class="time-icon">📖</div>
-                        <div class="time-value">{{ reading_time }}</div>
-                        <div class="time-label">Reading</div>
-                    </div> 
-                    <div class="time-stat">
-                        <div class="time-icon">🗣️</div>
-                        <div class="time-value">{{ speaking_time }}</div>   
-                        <div class="time-label">Speaking</div>
-                    </div>    
-                </div>  
-            </div>
-
-
-            <!-- Топ слов -->
-            {% if top_words %}
-            <div class="card">
-                <div class="card-title">🔝 Top Words</div>
-                {% for item in top_words %}
-                <div class="word-item">
-                    <div class="word-header">
-                        <span>{{ item.word }}</span>
-                        <span>{{ item.count }} ({{ item.percent }}%)</span>
-                    </div>
-                    <div class="word-bar">
-                        <div class="word-bar-fill" style="width: {{ item.percent }}%"></div>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-            {% endif %} 
-
-
-            <!-- === ОБЪЕДИНЕННАЯ ПАНЕЛЬ ЭКСПОРТА === -->
-            <div class="export-bar">
-                <!-- 1. TXT Кнопка -->
-                <form action="/export/" method="POST">
-                    {% csrf_token %}
-                    <!-- Скрытые поля для данных -->
-                    <input type="hidden" name="text" value="{{ text }}">
-                    <input type="hidden" name="word" value="{{ word }}">
-                    <input type="hidden" name="chars" value="{{ chars }}">
-                    <input type="hidden" name="chars_no_spaces" value="{{ chars_no_spaces }}">
-                    <input type="hidden" name="unique_words" value="{{ unique_words }}">
-        
-                    <button type="submit" class="btn-export txt-btn">
-                        📄 Export to .txt
-                    </button>
-                </form>
-
-                <!-- 2. PDF Кнопка -->
-                <form action="/export-pdf/" method="POST">
-                    {% csrf_token %}
-                    <!-- Скрытые поля для данных -->
-                    <input type="hidden" name="text" value="{{ text }}">
-                    <input type="hidden" name="word" value="{{ word }}">
-                    <input type="hidden" name="chars" value="{{ chars }}">
-                    <input type="hidden" name="chars_no_spaces" value="{{ chars_no_spaces }}">
-                    <input type="hidden" name="unique_words" value="{{ unique_words }}">
-                    <input type="hidden" name="reading_time" value="{{ reading_time }}">
-                    <input type="hidden" name="speaking_time" value="{{ speaking_time }}">
-                    <input type="hidden" name="sentiment_label" value="{{ sentiment_label }}">
-                    <input type="hidden" name="top_words" value="{% for item in top_words %}{{ item.word }} - {{ item.count }} ({{ item.percent }}%)&#10;{% endfor %}">
-
-                    <button type="submit" class="btn-export pdf-btn">
-                        📕 Export to PDF
-                    </button>
-                </form>
-            </div>
-    </div> 
-
-
-    <!-- ЕСЛИ НЕТ ТЕКСТА (просто форма) -->
-    {% else %}
-        <div class="input-section" style="max-width: 600px; margin: 0 auto;">
-            <form action="" method="POST" enctype="multipart/form-data">
-                {% csrf_token %}
-                
-                <div class="file-upload">
-                    <label for="text_file">📄 Upload .txt file</label>
-                    <input type="file" id="text_file" name="text_file" accept=".txt" style="display: none;" onchange="document.getElementById('file_name').textContent = this.files[0].name">
-                    <div id="file_name"></div>
-                </div>
-
-                <textarea name="texttocount" placeholder="Paste your text here..." style="min-height: 250px;"></textarea>
-
-                <div class="form-options">
-                    <label><input type="checkbox" name="case_sensitive" value="1"> Case sensitive (Hello ≠ hello)</label>
-                    <label><input type="checkbox" name="ignore_numbers" value="1"> Ignore numbers (123 not counted)</label>
-                </div>
-
-                <div class="form-buttons">
-                    <button type="submit" class="btn-count">Count →</button>
-                    <button type="button" class="btn-clear" onclick="clearAll()">Clear ✕</button>
-                       
-                </div>
-            </form>
+        <!-- Загрузка файла -->
+        <div class="file-upload">
+            <label for="text_file">📄 Upload .txt file</label>
+            <input type="file" id="text_file" name="text_file" accept=".txt,.pdf" style="display: none;" onchange="document.getElementById('file_name').textContent = this.files[0].name">
+            <div id="file_name"></div>
         </div>
-        {% endif %}
 
-    </div>    
+        <!-- Текстовое поле -->
+        <textarea name="texttocount" placeholder="Paste your text here...">{{ text }}</textarea>
+
+        <!-- Быстрые действия (ТЕПЕРЬ ВСЕГДА ВИДНЫ) -->
+        <div style="display: flex; gap: 8px; margin-top: 10px; margin-bottom: 15px;">
+            <button type="button" onclick="cleanText()" class="btn-tool" title="Removes unnecessary spaces">
+                ✂️ Clear spaces
+            </button>
+            <button type="button" onclick="copyText()" class="btn-tool" title="Copy text to the clipboard">
+                📋 Copy text
+            </button>
+        </div>
+
+        <!-- Чекбоксы -->
+        <div class="form-options">
+            <label>
+                <input type="checkbox" name="case_sensitive" value="1" {% if case_sensitive %}checked{% endif %}>
+                Case sensitive (Hello ≠ hello)
+            </label>
+            <label>
+                <input type="checkbox" name="ignore_numbers" value="1" {% if ignore_numbers %}checked{% endif %}>
+                Ignore numbers (123 not counted)
+            </label>
+        </div>
+
+        <!-- Кнопки -->
+        <div class="form-buttons">
+            <button type="submit" class="btn-count">Count →</button>
+            <button type="button" class="btn-clear" onclick="clearAll()">Clear ✕</button>
+        </div>
+    </form>
+</div>
+
+<!-- ПРАВАЯ КОЛОНКА: РЕЗУЛЬТАТЫ (ТОЛЬКО ЕСЛИ ЕСТЬ ТЕКСТ) -->
+{% if text %}
+<div class="results-section">
+    <!-- Статистика -->
+    <div class="card">
+        <div class="card-title">
+            <span class="icon">📊</span> Analysis
+        </div>    
+        <div class="stats-grid">
+            <div class="stat-item"><div class="stat-value">{{ word }}</div><div class="stat-label">Words</div></div>
+            <div class="stat-item"><div class="stat-value">{{ unique_words }}</div><div class="stat-label">Unique</div></div>
+            <div class="stat-item"><div class="stat-value">{{ chars }}</div><div class="stat-label">Chars</div></div>
+            <div class="stat-item"><div class="stat-value">{{ chars_no_spaces }}</div><div class="stat-label">No spaces</div></div>
+        </div>
+    </div>
+
+    <!-- Время -->
+    <div class="card">
+        <div class="card-title">
+            <span class="icon">🕐</span> Reading & Speaking
+        </div>    
+        <div class="time-grid">
+            <div class="time-stat">
+                <div class="time-icon">📖</div>
+                <div class="time-value">{{ reading_time }}</div>
+                <div class="time-label">Reading</div>
+            </div>
+            <div class="time-stat">
+                <div class="time-icon">🗣️</div>
+                <div class="time-value">{{ speaking_time }}</div>
+                <div class="time-label">Speaking</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Words -->
+    {% if top_words %}
+    <div class="card">
+        <div class="card-title">
+            <span class="icon">📈</span> Top Words
+        </div>    
+        {% for item in top_words %}
+        <div class="word-item">
+            <div class="word-header">
+                <span>{{ item.word }}</span>
+                <span>{{ item.count }} ({{ item.percent }}%)</span>
+            </div>
+            <div class="word-bar">
+                <div class="word-bar-fill" style="width: {{ item.percent }}%"></div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Экспорт -->
+    <div class="export-bar">
+        <form action="/export/" method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="text" value="{{ text }}">
+            <input type="hidden" name="word" value="{{ word }}">
+            <input type="hidden" name="chars" value="{{ chars }}">
+            <input type="hidden" name="chars_no_spaces" value="{{ chars_no_spaces }}">
+            <input type="hidden" name="unique_words" value="{{ unique_words }}">
+            <button type="submit" class="btn-export txt-btn">📄 Export to .txt</button>
+        </form>
+        
+        <form action="/export-pdf/" method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="text" value="{{ text }}">
+            <input type="hidden" name="word" value="{{ word }}">
+            <input type="hidden" name="chars" value="{{ chars }}">
+            <input type="hidden" name="chars_no_spaces" value="{{ chars_no_spaces }}">
+            <input type="hidden" name="unique_words" value="{{ unique_words }}">
+            <input type="hidden" name="reading_time" value="{{ reading_time }}">
+            <input type="hidden" name="speaking_time" value="{{ speaking_time }}">
+            <input type="hidden" name="sentiment_label" value="{{ sentiment_label }}">
+            <input type="hidden" name="top_words" value="{% for item in top_words %}{{ item.word }} - {{ item.count }} ({{ item.percent }}%)&#10;{% endfor %}">
+            <button type="submit" class="btn-export pdf-btn">📕 Export to PDF</button>
+        </form>
+    </div>
+</div>
+{% endif %}
+
+</div>
 
     
     <!-- МОДАЛЬНОЕ ОКНО -->
@@ -235,52 +203,66 @@
     </div>
 
 <script>
+
 function showFileName(input) {
     const fileName = input.files[0] ? input.files[0].name : '';
     document.getElementById('file_name').textContent = fileName;
 }   
 
+
 function clearAll() {
-    console.log('Очистка началась...');
-    
-    // 1. Очищаем textarea
+    // 1. Очищаем текст
     const textarea = document.querySelector('textarea[name="texttocount"]');
-    if (textarea) {
-        textarea.value = '';
-        console.log('✓ Текст очищен');
-    }
+    if (textarea) textarea.value = '';
     
     // 2. Сбрасываем файл
     const fileInput = document.getElementById('text_file');
-    if (fileInput) {
-        fileInput.value = '';
-        console.log('✓ Файл сброшен');
+    if (fileInput) fileInput.value = '';
+    
+    // 3. Очищаем имя файла
+    const fileNameEl = document.getElementById('file_name');
+    if (fileNameEl) fileNameEl.textContent = '';
+    
+    // 4. Убираем класс с двумя колонками
+    const layout = document.querySelector('.results-layout');
+    if (layout) {
+        layout.classList.remove('has-results');
     }
     
-    // 3. Скрываем AI бейдж
-    const aiBadge = document.querySelector('.ai-badge');
-    if (aiBadge) {
-        aiBadge.style.display = 'none';
-        console.log('✓ AI скрыт');
-    }
-    
-    // 4. Скрываем результаты
+    // 5. 🔥 СКРЫВАЕМ ПРАВУЮ КОЛОНКУ С РЕЗУЛЬТАТАМИ
     const resultsSection = document.querySelector('.results-section');
     if (resultsSection) {
         resultsSection.style.display = 'none';
-        console.log('✓ Результаты скрыты');
     }
     
-    // 5. Меняем сетку на 1 колонку
-    const layout = document.querySelector('.results-layout');
-    if (layout) {
-        layout.style.gridTemplateColumns = '1fr';
-        console.log('✓ Сетка изменена');
-    }
-    
-    console.log('Очистка завершена!');
+    // 6. Скрываем AI бейдж
+    const aiBadge = document.querySelector('.ai-badge');
+    if (aiBadge) aiBadge.style.display = 'none';
 }
 
+
+// Функция очистки текста
+function cleanText() {
+    const textarea = document.querySelector('textarea');
+    // 1. Убираем пробелы в начале и конце
+    // 2. Заменяем ВСЕ группы из нескольких пробелов на ОДИН пробел
+    textarea.value = textarea.value.trim().replace(/\s+/g, ' ');
+}
+
+
+// Функция копирования
+function copyText() {
+    const textarea = document.querySelector('textarea');
+    if (!textarea.value) return;
+    
+    navigator.clipboard.writeText(textarea.value).then(() => {
+        // Можно добавить небольшую вспышку или alert, если хочешь
+        const btn = document.querySelector('[title="Скопировать текст в буфер"]');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '✅ Скопировано!';
+        setTimeout(() => { btn.innerHTML = originalText; }, 1500);
+    });
+}
 
 </script>
 

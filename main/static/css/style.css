@@ -107,13 +107,21 @@ h1 {
     color: #f59e0b;
 }
 
-/* === МАКЕТ (ДВУХКОЛОНОЧНЫЙ) === */
+/* === СЕТКА МАКЕТА === */
 .results-layout {
     display: grid;
-    grid-template-columns: 1fr 380px;
     gap: 30px;
     align-items: start;
+    /* По умолчанию 1 колонка (когда нет результатов) */
+    grid-template-columns: 1fr;
+    max-width: 100%;
 }
+
+/* Когда ЕСТЬ результаты — ДВЕ КОЛОНКИ */
+.results-layout.has-results {
+    grid-template-columns: 1fr 400px !important; /* ← !important гарантирует применение */
+}
+
 
 .input-section {
     display: flex;
@@ -125,9 +133,6 @@ h1 {
     display: flex;
     flex-direction: column;
     gap: 15px;
-    max-height: 70vh;
-    overflow-y: auto;
-    padding-right: 5px;
 }
 
 /* Скроллбар для результатов */
@@ -258,17 +263,91 @@ textarea:focus {
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 12px;
-    padding: 15px;
+    padding: 20px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
 }
 
+/* Эффект свечения при наведении */
+.card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(167, 139, 250, 0.1), transparent);
+    transition: left 0.5s ease;
+}
+
+.card:hover::before {
+    left: 100%;
+}
+
+.card:hover {
+    border-color: rgba(167, 139, 250, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+/* === ЗАГОЛОВКИ КАРТОЧЕК === */
 .card-title {
     font-size: 11px;
+    font-weight: 700;
     text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.5);
-    margin-bottom: 12px;
-    letter-spacing: 1px;
-    font-weight: 600;
+    letter-spacing: 1.5px;
+    margin-bottom: 15px;
+    padding-bottom: 12px;
+    position: relative;
+    
+    /* Градиентный текст */
+    background: linear-gradient(135deg, #a78bfa, #60a5fa, #a78bfa);
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: gradientShift 3s ease infinite;
+    
+    /* Свечение */
+    filter: drop-shadow(0 0 8px rgba(167, 139, 250, 0.3));
+    
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
+
+/* Декоративная линия снизу */
+.card-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 40px;
+    height: 2px;
+    background: linear-gradient(90deg, #a78bfa, transparent);
+    border-radius: 2px;
+    transition: width 0.3s ease;
+}
+
+/* При наведении линия расширяется */
+.card:hover .card-title::after {
+    width: 60px;
+    background: linear-gradient(90deg, #a78bfa, #60a5fa);
+}
+
+/* Анимация градиента */
+@keyframes gradientShift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+/* Иконка в заголовке */
+.card-title .icon {
+    font-size: 14px;
+    filter: drop-shadow(0 0 4px rgba(167, 139, 250, 0.5));
+}
+
 
 /* Сетка статистики */
 .stats-grid {
@@ -459,4 +538,26 @@ textarea:focus {
     color: white;
     font-size: 24px;
     cursor: pointer;
+}
+
+.btn-tool {
+    flex: 1;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.btn-tool:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border-color: rgba(255, 255, 255, 0.3);
 }
