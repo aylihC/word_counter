@@ -498,13 +498,13 @@ def activate(request, uidb64, token):
     try:
         uid = force_str(urlsafe_base64_decode(uidb64))
         user = User.objects.get(pk=uid)
-    except:
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
         user = None
 
     if user and default_token_generator.check_token(user, token):
         user.is_active = True
         user.save()
         login(request, user)
-        return redirect('/')
+        return redirect('counter')
     else:
         return render(request, 'register.html', {'error': 'Activation link is invalid or expired'})
