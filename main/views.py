@@ -414,7 +414,7 @@ def register(request):
         uid = urlsafe_base64_encode(force_bytes(user.pk))
         token = default_token_generator.make_token(user)
         domain = request.get_host()
-        activation_link = f'http://{domain}/activate/{uid}/{token}/'
+        activation_link = f'https://{domain}/activate/{uid}/{token}/'
 
         send_mail(
             'Activate your account',
