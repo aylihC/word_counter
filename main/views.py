@@ -113,6 +113,22 @@ def counter(request):
             text = request.POST.get('texttocount', '')
 
 
+            # Проверка на пустоту
+            if not text:
+                return render(request, 'counter.html', {
+                    'error': 'Please enter some text or upload a file!',
+                    'text': '',
+                    'word': 0,
+                    'unique_words': 0,
+                    'chars': 0,
+                    'chars_no_spaces': 0,
+                    'reading_time': '~0 sec',
+                    'speaking_time': '~0 sec',
+                    'top_words': []
+                })
+
+
+
         if text.strip():
             # 1️⃣ Заменяем знаки препинания (кроме точки) на пробелы, чтобы разделять слова
             # ! ? , ; : ( ) [ ] { } - — – теперь работают как разделители
