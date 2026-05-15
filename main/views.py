@@ -408,22 +408,22 @@ def register(request):
             return render(request, 'register.html', {'error': 'Email already registered'})
         
         user = User.objects.create_user(username=username, email=email, password=password1)
-        user.is_active = False
+        user.is_active = True #False - поменять 
         user.save()
 
-        uid = urlsafe_base64_encode(force_bytes(user.pk))
-        token = default_token_generator.make_token(user)
-        domain = request.get_host()
-        activation_link = f'https://{domain}/activate/{uid}/{token}/'
+        #uid = urlsafe_base64_encode(force_bytes(user.pk))
+        #token = default_token_generator.make_token(user)
+        #domain = request.get_host()
+        #activation_link = f'https://{domain}/activate/{uid}/{token}/'
 
-        send_mail(
-            'Activate your account',
-            f'Hi {username}! Click the link to activate your account:\n\n{activation_link}',
-            None,
-            [email],
-        )    
-
-        return render(request, 'register.html', {'success': 'Check your email to activate your account!'})
+        #send_mail(
+            #'Activate your account',
+            #f'Hi {username}! Click the link to activate your account:\n\n{activation_link}',
+            #None,
+            #[email],
+        #)    
+        return render(request, 'register.html', {'success': 'Registration successful! You can now login.'})
+        #return render(request, 'register.html', {'success': 'Check your email to activate your account!'})
     
 
     return render(request, 'register.html')
