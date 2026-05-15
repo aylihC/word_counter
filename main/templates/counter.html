@@ -69,6 +69,13 @@
         <!-- Текстовое поле -->
         <textarea name="texttocount" placeholder="Paste your text here...">{{ text }}</textarea>
 
+        {% if error %}
+        <div class="error-message">
+            <span class="error-icon">⚠️</span>
+            {{ error }}
+        </div>
+        {% endif %}
+
         <!-- Быстрые действия (ТЕПЕРЬ ВСЕГДА ВИДНЫ) -->
         <div style="display: flex; gap: 8px; margin-top: 10px; margin-bottom: 15px;">
             <button type="button" onclick="cleanText()" class="btn-tool" title="Removes unnecessary spaces">
