@@ -60,32 +60,24 @@
     <form action="" method="POST" enctype="multipart/form-data">
         {% csrf_token %}
 
-        <!-- Загрузка файла -->
-        <div class="file-upload">
-            <label for="text_file">📄 Upload .txt file</label>
-            <input type="file" id="text_file" name="text_file" accept=".txt,.pdf" style="display: none;" onchange="document.getElementById('file_name').textContent = this.files[0].name">
-            <div id="file_name"></div>
+        
+        <!-- 🔥 НОВАЯ ЗОНА DRAG & DROP -->
+        <div class="file-upload drop-zone" id="drop-zone">
+            <input type="file" id="text_file" name="text_file" accept=".txt,.pdf" style="display: none;">
+    
+            <div class="drop-zone-content">
+                <span class="drop-icon"></span>
+                <span class="drop-title">Drag & drop file here</span>
+                <span class="drop-subtitle">Supports .txt and .pdf</span>
+            </div>
+    
+            <div id="file_name" class="file-selected"></div>
         </div>
+
 
         <!-- Текстовое поле -->
         <textarea name="texttocount" placeholder="Paste your text here...">{{ text }}</textarea>
 
-        
-        <!-- 🔥 ЖИВОЙ СЧЕТЧИК (LIVE STATS) -->
-        <div class="live-stats-bar">
-            <div class="stat-pill">
-                <span id="live-word-count">0</span>
-                <span class="stat-label">Words</span>
-            </div>
-            <div class="stat-pill">
-                <span id="live-char-count">0</span>
-                <span class="stat-label">Chars</span>
-            </div>
-            <div class="stat-pill">
-                <span id="live-unique-count">0</span>
-                <span class="stat-label">Unique</span>
-            </div>
-        </div>
 
 
         {% if error %}
@@ -291,45 +283,56 @@ function copyText() {
 }
 
 
-    // === ЖИВОЙ СЧЕТЧИК ===
-    const textArea = document.querySelector('textarea[name="texttocount"]');
-    const liveWords = document.getElementById('live-word-count');
-    const liveChars = document.getElementById('live-char-count');
-    const liveUnique = document.getElementById('live-unique-count');
 
-    function updateLiveStats() {
-        const text = textArea.value;
-        
-        // 1. Символы
-        liveChars.textContent = text.length;
+// === DRAG & DROP ЛОГИКА ===
+const dropZone = document.getElementById('drop-zone');
+const fileInput = document.getElementById('text_file');
+const fileNameDisplay = document.getElementById('file_name');
 
-        // 2. Слова (разбиваем по пробелам, убираем пустые)
-        // \s+ ищет один или более пробельных символов
-        const wordsArray = text.trim().split(/\s+/).filter(word => word.length > 0);
-        liveWords.textContent = wordsArray.length;
+// 1. Клик по зоне открывает выбор файла
+dropZone.addEventListener('click', () => fileInput.click());
 
-        // 3. Уникальные слова (опционально, для крутости)
-        const uniqueWords = new Set(wordsArray.map(w => w.toLowerCase()));
-        liveUnique.textContent = uniqueWords.size;
-    }
+// 2. Предотвращаем стандартное поведение браузера (открытие файла в новой вкладке)
+['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+    dropZone.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+    }, false);
+});
 
-    // Слушаем ввод текста
-    textArea.addEventListener('input', updateLiveStats);
+// 3. Визуальная подсветка при перетаскивании
+['dragenter', 'dragover'].forEach(eventName => {
+    dropZone.addEventListener(eventName, () => dropZone.classList.add('drag-over'), false);
+});
 
-    // Запускаем один раз при загрузке страницы (на случай если текст остался после перезагрузки)
-    if (textArea.value) {
-        updateLiveStats();
-    }
+['dragleave', 'drop'].forEach(eventName => {
+    dropZone.addEventListener(eventName, () => dropZone.classList.remove('drag-over'), false);
+});
+
+// 4. Обработка броска файла
+dropZone.addEventListener('drop', (e) => {
+    const dt = e.dataTransfer;
+    const files = dt.files;
     
-    // Хак: обновляем статистику, когда срабатывает кнопка "Clear spaces"
-    // Находим старую функцию и добавляем вызов updateLiveStats() в конец
-    const originalCleanText = window.cleanText;
-    if (typeof originalCleanText === 'function') {
-        window.cleanText = function() {
-            originalCleanText();
-            updateLiveStats(); // Обновляем цифры после очистки
-        };
+    if (files.length > 0) {
+        fileInput.files = files; // Привязываем файл к скрытому инпуту
+        updateFileName(files[0]);
+        fileInput.dispatchEvent(new Event('change')); // Триггерим событие для других скриптов
     }
+}, false);
+
+// 5. Обработка выбора через обычный клик
+fileInput.addEventListener('change', function() {
+    if (this.files.length > 0) {
+        updateFileName(this.files[0]);
+    }
+});
+
+// Функция обновления имени файла
+function updateFileName(file) {
+    fileNameDisplay.textContent = `✅ ${file.name}`;
+}
+
 
 
 
