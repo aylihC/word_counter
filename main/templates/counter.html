@@ -28,6 +28,14 @@
         </button>
 
 
+
+        <!-- 🔥 КНОПКА СМЕНЫ ТЕМЫ -->
+        <button id="theme-toggle" class="theme-btn" title="Switch Theme">
+    
+        </button>
+
+
+
         <!-- 🔥 АВТОРИЗАЦИЯ (СПРАВА) -->
         <div class="auth-buttons">
             {% if user.is_authenticated %}
@@ -270,6 +278,35 @@ function copyText() {
         setTimeout(() => { btn.innerHTML = originalText; }, 1500);
     });
 }
+
+
+// Логика смены темы
+const themeBtn = document.getElementById('theme-toggle');
+const body = document.body;
+
+// Проверяем, была ли сохранена тема ранее
+const savedTheme = localStorage.getItem('theme');
+if (savedTheme === 'light') {
+    body.classList.add('light-mode');
+    themeBtn.textContent = '🌙'; // Если светлая тема — показываем Луну (чтобы переключить на темную)
+} else {
+    themeBtn.textContent = '☀️'; // По умолчанию (темная тема) — показываем Солнце
+}
+
+themeBtn.addEventListener('click', () => {
+    body.classList.toggle('light-mode');
+    
+    // Меняем иконку и сохраняем выбор в память браузера
+    if (body.classList.contains('light-mode')) {
+        themeBtn.textContent = '🌙';
+        localStorage.setItem('theme', 'light');
+    } else {
+        themeBtn.textContent = '☀️'; 
+        localStorage.setItem('theme', 'dark');
+    }
+});
+
+
 
 </script>
 
