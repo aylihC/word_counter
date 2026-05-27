@@ -72,12 +72,11 @@
             </div>
     
             <!-- Кнопка удаления файла (появляется когда файл выбран) -->
-            <div id="file_name" class="file-selected" style="display: none;"></div>
+            <div id="file_name" class="file-selected">
                 <span class="file-icon">✅</span>
-                <span class="file-name"></span>
-                <button type="button" class="file-remove-btn" id="file-remove-btn" title="Remove file">✕</button>
-            </div>
-        </div>    
+                <span class="file-name-text"></span>
+                <button type="button" class="file-remove" id="file-remove" title="Remove file">×</button>
+            </div>    
 
 
         <!-- Текстовое поле -->
@@ -293,19 +292,13 @@ function copyText() {
 const dropZone = document.getElementById('drop-zone');
 const fileInput = document.getElementById('text_file');
 const fileNameDisplay = document.getElementById('file_name');
-const fileNameText = fileNameDisplay.querySelector('.file-name');
-const fileRemoveBtn = document.getElementById('file-remove-btn');
-const dropZoneContent = dropZone.querySelector('.drop-zone-content');
+const fileNameText = fileNameDisplay.querySelector('.file-name-text');
+const fileRemoveBtn = document.getElementById('file-remove');
 
-// 1. Клик по зоне открывает выбор файла
-dropZone.addEventListener('click', (e) => {
-    // Не открываем выбор файла, если кликнули на кнопку удаления
-    if (e.target !== fileRemoveBtn && !fileRemoveBtn.contains(e.target)) {
-        fileInput.click();
-    }
-});
+// Клик по зоне
+dropZone.addEventListener('click', () => fileInput.click());
 
-// 2. Предотвращаем стандартное поведение браузера
+// Предотвращаем стандартное поведение
 ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
     dropZone.addEventListener(eventName, (e) => {
         e.preventDefault();
@@ -313,7 +306,7 @@ dropZone.addEventListener('click', (e) => {
     }, false);
 });
 
-// 3. Визуальная подсветка при перетаскивании
+// Подсветка при перетаскивании
 ['dragenter', 'dragover'].forEach(eventName => {
     dropZone.addEventListener(eventName, () => dropZone.classList.add('drag-over'), false);
 });
@@ -322,49 +315,30 @@ dropZone.addEventListener('click', (e) => {
     dropZone.addEventListener(eventName, () => dropZone.classList.remove('drag-over'), false);
 });
 
-// 4. Обработка броска файла
+// Обработка drop
 dropZone.addEventListener('drop', (e) => {
-    const dt = e.dataTransfer;
-    const files = dt.files;
-    
+    const files = e.dataTransfer.files;
     if (files.length > 0) {
-        // Проверка расширения
-        const fileName = files[0].name.toLowerCase();
-        if (fileName.endsWith('.txt') || fileName.endsWith('.pdf')) {
-            fileInput.files = files;
-            showFileName(files[0]);
-        } else {
-            alert('Please upload .txt or .pdf files only');
-        }
+        fileInput.files = files;
+        fileNameText.textContent = files[0].name;
+        fileNameDisplay.style.display = 'flex';
     }
 }, false);
 
-// 5. Обработка выбора через обычный клик
+// Обработка выбора файла
 fileInput.addEventListener('change', function() {
     if (this.files.length > 0) {
-        showFileName(this.files[0]);
+        fileNameText.textContent = this.files[0].name;
+        fileNameDisplay.style.display = 'flex';
     }
 });
 
-// 6. 🔥 КНОПКА УДАЛЕНИЯ ФАЙЛА
+// 🔥 УДАЛЕНИЕ ФАЙЛА
 fileRemoveBtn.addEventListener('click', (e) => {
-    e.stopPropagation(); // Чтобы не открывался выбор файла
-    removeFile();
-});
-
-// Функция отображения имени файла
-function showFileName(file) {
-    fileNameText.textContent = file.name;
-    fileNameDisplay.style.display = 'flex';
-    dropZoneContent.style.display = 'none'; // Скрываем текст "Drag & drop"
-}
-
-// Функция удаления файла
-function removeFile() {
-    fileInput.value = ''; // Очищаем input
+    e.stopPropagation();
+    fileInput.value = '';
     fileNameDisplay.style.display = 'none';
-    dropZoneContent.style.display = 'flex'; // Показываем текст "Drag & drop"
-}
+});
 
 
 
