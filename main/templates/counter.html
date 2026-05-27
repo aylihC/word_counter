@@ -324,11 +324,32 @@ const fileInput = document.getElementById('text_file');
 const fileNameDisplay = document.getElementById('file_name');
 const fileNameText = fileNameDisplay.querySelector('.file-name-text');
 const fileRemoveBtn = document.getElementById('file-remove');
+const dropZoneContent = dropZone.querySelector('.drop-zone-content');
+
+// Функция показа имени файла
+function showFileName(file) {
+    if (!file) return;
+    
+    fileNameText.textContent = file.name;
+    fileNameDisplay.style.display = 'flex';
+    dropZoneContent.style.display = 'none';
+}
+
+// Функция удаления файла
+function removeFile() {
+    fileInput.value = '';
+    fileNameDisplay.style.display = 'none';
+    dropZoneContent.style.display = 'flex';
+}
 
 // Клик по зоне
-dropZone.addEventListener('click', () => fileInput.click());
+dropZone.addEventListener('click', (e) => {
+    if (e.target !== fileRemoveBtn && !fileRemoveBtn.contains(e.target)) {
+        fileInput.click();
+    }
+});
 
-// Предотвращаем стандартное поведение
+// Предотвращаем стандартное поведение для всех drag событий
 ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
     dropZone.addEventListener(eventName, (e) => {
         e.preventDefault();
@@ -336,38 +357,58 @@ dropZone.addEventListener('click', () => fileInput.click());
     }, false);
 });
 
-// Подсветка при перетаскивании
+// Визуальная подсветка
 ['dragenter', 'dragover'].forEach(eventName => {
-    dropZone.addEventListener(eventName, () => dropZone.classList.add('drag-over'), false);
+    dropZone.addEventListener(eventName, () => {
+        dropZone.classList.add('drag-over');
+    }, false);
 });
 
 ['dragleave', 'drop'].forEach(eventName => {
-    dropZone.addEventListener(eventName, () => dropZone.classList.remove('drag-over'), false);
+    dropZone.addEventListener(eventName, () => {
+        // Проверяем, что уходим именно из зоны, а не в дочерний элемент
+        if (!dropZone.contains(e.relatedTarget)) {
+            dropZone.classList.remove('drag-over');
+        }
+    }, false);
 });
 
-// Обработка drop
+// Обработка drop - ГЛАВНАЯ ЧАСТЬ
 dropZone.addEventListener('drop', (e) => {
-    const files = e.dataTransfer.files;
+    const dt = e.dataTransfer;
+    const files = dt.files;
+    
+    dropZone.classList.remove('drag-over');
+    
     if (files.length > 0) {
-        fileInput.files = files;
-        fileNameText.textContent = files[0].name;
-        fileNameDisplay.style.display = 'flex';
+        const file = files[0];
+        
+        // Проверка расширения
+        const fileName = file.name.toLowerCase();
+        if (fileName.endsWith('.txt') || fileName.endsWith('.pdf')) {
+            // Устанавливаем файл в input
+            fileInput.files = files;
+            // Показываем имя
+            showFileName(file);
+            // Триггерим событие change для совместимости
+            fileInput.dispatchEvent(new Event('change'));
+        } else {
+            alert('Please upload only .txt or .pdf files');
+        }
     }
 }, false);
 
-// Обработка выбора файла
+// Обработка выбора через клик
 fileInput.addEventListener('change', function() {
     if (this.files.length > 0) {
-        fileNameText.textContent = this.files[0].name;
-        fileNameDisplay.style.display = 'flex';
+        showFileName(this.files[0]);
     }
 });
 
-// 🔥 УДАЛЕНИЕ ФАЙЛА
+// Кнопка удаления
 fileRemoveBtn.addEventListener('click', (e) => {
     e.stopPropagation();
-    fileInput.value = '';
-    fileNameDisplay.style.display = 'none';
+    removeFile();
 });
 
 
