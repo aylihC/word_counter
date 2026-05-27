@@ -29,13 +29,6 @@
 
 
 
-        <!-- 🔥 КНОПКА СМЕНЫ ТЕМЫ -->
-        <button id="theme-toggle" class="theme-btn" title="Switch Theme">
-    
-        </button>
-
-
-
         <!-- 🔥 АВТОРИЗАЦИЯ (СПРАВА) -->
         <div class="auth-buttons">
             {% if user.is_authenticated %}
@@ -76,6 +69,24 @@
 
         <!-- Текстовое поле -->
         <textarea name="texttocount" placeholder="Paste your text here...">{{ text }}</textarea>
+
+        
+        <!-- 🔥 ЖИВОЙ СЧЕТЧИК (LIVE STATS) -->
+        <div class="live-stats-bar">
+            <div class="stat-pill">
+                <span id="live-word-count">0</span>
+                <span class="stat-label">Words</span>
+            </div>
+            <div class="stat-pill">
+                <span id="live-char-count">0</span>
+                <span class="stat-label">Chars</span>
+            </div>
+            <div class="stat-pill">
+                <span id="live-unique-count">0</span>
+                <span class="stat-label">Unique</span>
+            </div>
+        </div>
+
 
         {% if error %}
         <div class="error-message">
@@ -280,31 +291,45 @@ function copyText() {
 }
 
 
-// Логика смены темы
-const themeBtn = document.getElementById('theme-toggle');
-const body = document.body;
+    // === ЖИВОЙ СЧЕТЧИК ===
+    const textArea = document.querySelector('textarea[name="texttocount"]');
+    const liveWords = document.getElementById('live-word-count');
+    const liveChars = document.getElementById('live-char-count');
+    const liveUnique = document.getElementById('live-unique-count');
 
-// Проверяем, была ли сохранена тема ранее
-const savedTheme = localStorage.getItem('theme');
-if (savedTheme === 'light') {
-    body.classList.add('light-mode');
-    themeBtn.textContent = '🌙'; // Если светлая тема — показываем Луну (чтобы переключить на темную)
-} else {
-    themeBtn.textContent = '☀️'; // По умолчанию (темная тема) — показываем Солнце
-}
+    function updateLiveStats() {
+        const text = textArea.value;
+        
+        // 1. Символы
+        liveChars.textContent = text.length;
 
-themeBtn.addEventListener('click', () => {
-    body.classList.toggle('light-mode');
-    
-    // Меняем иконку и сохраняем выбор в память браузера
-    if (body.classList.contains('light-mode')) {
-        themeBtn.textContent = '🌙';
-        localStorage.setItem('theme', 'light');
-    } else {
-        themeBtn.textContent = '☀️'; 
-        localStorage.setItem('theme', 'dark');
+        // 2. Слова (разбиваем по пробелам, убираем пустые)
+        // \s+ ищет один или более пробельных символов
+        const wordsArray = text.trim().split(/\s+/).filter(word => word.length > 0);
+        liveWords.textContent = wordsArray.length;
+
+        // 3. Уникальные слова (опционально, для крутости)
+        const uniqueWords = new Set(wordsArray.map(w => w.toLowerCase()));
+        liveUnique.textContent = uniqueWords.size;
     }
-});
+
+    // Слушаем ввод текста
+    textArea.addEventListener('input', updateLiveStats);
+
+    // Запускаем один раз при загрузке страницы (на случай если текст остался после перезагрузки)
+    if (textArea.value) {
+        updateLiveStats();
+    }
+    
+    // Хак: обновляем статистику, когда срабатывает кнопка "Clear spaces"
+    // Находим старую функцию и добавляем вызов updateLiveStats() в конец
+    const originalCleanText = window.cleanText;
+    if (typeof originalCleanText === 'function') {
+        window.cleanText = function() {
+            originalCleanText();
+            updateLiveStats(); // Обновляем цифры после очистки
+        };
+    }
 
 
 

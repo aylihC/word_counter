@@ -563,58 +563,46 @@ textarea:focus {
 }
 
 
-/* Кнопка переключения темы */
-.theme-btn {
+
+/* === ЖИВОЙ СЧЕТЧИК (LIVE STATS) === */
+.live-stats-bar {
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+    margin-bottom: 12px;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.4); /* Полупрозрачный для темной темы */
+    font-family: 'JetBrains Mono', monospace; /* Моноширинный шрифт для цифр */
+}
+
+.stat-pill {
+    display: flex;
+    align-items: center;
+    gap: 4px;
     background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 8px;
-    padding: 6px 10px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: all 0.3s;
-    margin-right: 10px; /* Отступ от кнопок входа */
+    padding: 2px 8px;
+    border-radius: 4px;
 }
 
-.theme-btn:hover {
-    background: rgba(255, 255, 255, 0.15);
-    transform: scale(1.1);
+.stat-pill span:first-child {
+    color: #a78bfa; /* Фиолетовый акцент */
+    font-weight: bold;
+    font-size: 13px;
 }
 
-/* === НАСТРОЙКИ ТЕМЫ === */
-/* Темная тема (по умолчанию) */
-body {
-    background-color: #0f172a; /* Твой темный фон */
-    color: white;
+/* Адаптация для светлой темы */
+body.light-mode .live-stats-bar {
+    color: rgba(0, 0, 0, 0.4);
+}
+body.light-mode .stat-pill {
+    background: rgba(0, 0, 0, 0.05);
+}
+body.light-mode .stat-pill span:first-child {
+    color: #4f46e5; /* Более темный фиолетовый для света */
 }
 
-/* Светлая тема (будет включаться через JS) */
-body.light-mode {
-    background-color: #f1f5f9; /* Светлый фон */
-    color: #1e293b; /* Темный текст */
-}
 
-/* Инверсия стекла для светлой темы */
-body.light-mode .container,
-body.light-mode .input-section,
-body.light-mode .card {
-    background: rgba(255, 255, 255, 0.6); /* Более плотный фон */
-    border-color: rgba(0, 0, 0, 0.1);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
-}
 
-body.light-mode textarea {
-    background: rgba(255, 255, 255, 0.5);
-    color: #1e293b;
-    border-color: rgba(0, 0, 0, 0.1);
-}
-
-/* Пример инверсии заголовка */
-body.light-mode h1 {
-    background: linear-gradient(135deg, #4f46e5, #06b6d4); /* Синий градиент для света */
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-}
 
 
 /* === СООБЩЕНИЕ ОБ ОШИБКЕ ПОД TEXTAREA === */
