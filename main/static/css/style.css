@@ -247,15 +247,44 @@ textarea:focus {
     box-shadow: 0 10px 20px rgba(167, 139, 250, 0.3);
 }
 
+/* === КНОПКА CLEAR (Второстепенная, но стильная) === */
 .btn-clear {
+    flex: 1;
+    /* Прозрачный фон с тонкой границей */
     background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    color: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.8);
+    font-weight: 600;
+    transition: all 0.3s ease; /* Плавный переход */
 }
 
+/* 🔥 ЭФФЕКТ ПРИ НАВЕДЕНИИ (КАК У COUNT) */
 .btn-clear:hover {
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
+    background: rgba(255, 255, 255, 0.15); /* Фон становится ярче */
+    border-color: rgba(255, 255, 255, 0.5); /* Граница светлеет */
+    color: #fff;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.1); /* Мягкое свечение */
+    transform: translateY(-2px); /* Легкий подъем вверх */
+    cursor: pointer;
+}
+
+/* Эффект нажатия */
+.btn-clear:active {
+    transform: translateY(0);
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Для светлой темы (чтобы кнопка была видна) */
+body.light-mode .btn-clear {
+    background: rgba(0, 0, 0, 0.05);
+    border-color: rgba(0, 0, 0, 0.2);
+    color: #334155;
+}
+
+body.light-mode .btn-clear:hover {
+    background: rgba(0, 0, 0, 0.1);
+    border-color: rgba(0, 0, 0, 0.4);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
 }
 
 /* === КАРТОЧКИ РЕЗУЛЬТАТОВ === */
@@ -573,6 +602,10 @@ textarea:focus {
     transition: all 0.3s ease;
     background: rgba(255, 255, 255, 0.02);
     position: relative;
+    min-height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 /* Состояние при наведении файла */
@@ -584,13 +617,15 @@ textarea:focus {
 }
 
 .drop-zone-content {
-    pointer-events: none; /* Чтобы клики проходили сквозь текст на input */
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
 }
 
 .drop-icon {
     font-size: 28px;
-    display: block;
-    margin-bottom: 8px;
     opacity: 0.8;
 }
 
@@ -598,22 +633,62 @@ textarea:focus {
     font-size: 14px;
     font-weight: 500;
     color: rgba(255, 255, 255, 0.8);
-    display: block;
 }
 
 .drop-subtitle {
-    font-size: 12px;
+    font-size: 11px;
     color: rgba(255, 255, 255, 0.4);
-    display: block;
-    margin-top: 4px;
+    font-family: 'JetBrains Mono', monospace;
 }
 
+/* Выбранный файл */
 .file-selected {
-    margin-top: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(167, 139, 250, 0.15);
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(167, 139, 250, 0.3);
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.file-icon {
+    font-size: 16px;
+}
+
+.file-name {
+    flex: 1;
     font-size: 13px;
     color: #a78bfa;
     font-weight: 500;
     word-break: break-all;
+    text-align: left;
+}
+
+/* Кнопка удаления файла */
+.file-remove-btn {
+    background: rgba(239, 68, 68, 0.2);
+    border: none;
+    color: #fecaca;
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+.file-remove-btn:hover {
+    background: rgba(239, 68, 68, 0.4);
+    color: #fff;
+    transform: scale(1.1);
 }
 
 /* Светлая тема */
@@ -628,7 +703,19 @@ body.light-mode .drop-zone.drag-over {
 }
 body.light-mode .drop-title { color: #334155; }
 body.light-mode .drop-subtitle { color: #64748b; }
-body.light-mode .file-selected { color: #4f46e5; }
+body.light-mode .file-selected {
+    background: rgba(79, 70, 229, 0.1);
+    border-color: rgba(79, 70, 229, 0.3);
+}
+body.light-mode .file-name { color: #4f46e5; }
+body.light-mode .file-remove-btn {
+    background: rgba(220, 38, 38, 0.2);
+    color: #dc2626;
+}
+body.light-mode .file-remove-btn:hover {
+    background: rgba(220, 38, 38, 0.4);
+    color: #b91c1c;
+}
 
 
 

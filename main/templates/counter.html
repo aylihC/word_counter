@@ -71,8 +71,13 @@
                 <span class="drop-subtitle">Supports .txt and .pdf</span>
             </div>
     
-            <div id="file_name" class="file-selected"></div>
-        </div>
+            <!-- Кнопка удаления файла (появляется когда файл выбран) -->
+            <div id="file_name" class="file-selected" style="display: none;"></div>
+                <span class="file-icon">✅</span>
+                <span class="file-name"></span>
+                <button type="button" class="file-remove-btn" id="file-remove-btn" title="Remove file">✕</button>
+            </div>
+        </div>    
 
 
         <!-- Текстовое поле -->
@@ -288,11 +293,19 @@ function copyText() {
 const dropZone = document.getElementById('drop-zone');
 const fileInput = document.getElementById('text_file');
 const fileNameDisplay = document.getElementById('file_name');
+const fileNameText = fileNameDisplay.querySelector('.file-name');
+const fileRemoveBtn = document.getElementById('file-remove-btn');
+const dropZoneContent = dropZone.querySelector('.drop-zone-content');
 
 // 1. Клик по зоне открывает выбор файла
-dropZone.addEventListener('click', () => fileInput.click());
+dropZone.addEventListener('click', (e) => {
+    // Не открываем выбор файла, если кликнули на кнопку удаления
+    if (e.target !== fileRemoveBtn && !fileRemoveBtn.contains(e.target)) {
+        fileInput.click();
+    }
+});
 
-// 2. Предотвращаем стандартное поведение браузера (открытие файла в новой вкладке)
+// 2. Предотвращаем стандартное поведение браузера
 ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
     dropZone.addEventListener(eventName, (e) => {
         e.preventDefault();
@@ -315,22 +328,42 @@ dropZone.addEventListener('drop', (e) => {
     const files = dt.files;
     
     if (files.length > 0) {
-        fileInput.files = files; // Привязываем файл к скрытому инпуту
-        updateFileName(files[0]);
-        fileInput.dispatchEvent(new Event('change')); // Триггерим событие для других скриптов
+        // Проверка расширения
+        const fileName = files[0].name.toLowerCase();
+        if (fileName.endsWith('.txt') || fileName.endsWith('.pdf')) {
+            fileInput.files = files;
+            showFileName(files[0]);
+        } else {
+            alert('Please upload .txt or .pdf files only');
+        }
     }
 }, false);
 
 // 5. Обработка выбора через обычный клик
 fileInput.addEventListener('change', function() {
     if (this.files.length > 0) {
-        updateFileName(this.files[0]);
+        showFileName(this.files[0]);
     }
 });
 
-// Функция обновления имени файла
-function updateFileName(file) {
-    fileNameDisplay.textContent = `✅ ${file.name}`;
+// 6. 🔥 КНОПКА УДАЛЕНИЯ ФАЙЛА
+fileRemoveBtn.addEventListener('click', (e) => {
+    e.stopPropagation(); // Чтобы не открывался выбор файла
+    removeFile();
+});
+
+// Функция отображения имени файла
+function showFileName(file) {
+    fileNameText.textContent = file.name;
+    fileNameDisplay.style.display = 'flex';
+    dropZoneContent.style.display = 'none'; // Скрываем текст "Drag & drop"
+}
+
+// Функция удаления файла
+function removeFile() {
+    fileInput.value = ''; // Очищаем input
+    fileNameDisplay.style.display = 'none';
+    dropZoneContent.style.display = 'flex'; // Показываем текст "Drag & drop"
 }
 
 
