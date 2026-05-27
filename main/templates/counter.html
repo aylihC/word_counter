@@ -267,11 +267,17 @@ function clearAll() {
 
 // Функция очистки текста
 function cleanText() {
-    // === 1. Очищаем textarea (твоя старая логика) ===
+    // === 1. Очищаем textarea ===
     const textarea = document.querySelector('textarea[name="texttocount"]');
-    if (textarea) {
+    
+    if (textarea && textarea.value) {
         textarea.value = textarea.value.trim().replace(/\s+/g, ' ');
+
+        if (typeof updateLiveStats === 'function') {
+            updateLiveStats();
+        }   
     }
+    
     
     // === 2. 🔥 Очищаем загруженный файл ===
     const fileInput = document.getElementById('text_file');
