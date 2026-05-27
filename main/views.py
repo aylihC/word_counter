@@ -124,6 +124,7 @@ def counter(request):
                     'chars_no_spaces': 0,
                     'reading_time': '~0 sec',
                     'speaking_time': '~0 sec',
+                    'uploaded_file_name': uploaded_file.name if uploaded_file else None,
                     'top_words': []
                 })
 

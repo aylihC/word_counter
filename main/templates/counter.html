@@ -65,19 +65,20 @@
         <div class="file-upload drop-zone" id="drop-zone">
             <input type="file" id="text_file" name="text_file" accept=".txt,.pdf" style="display: none;">
     
-            <div class="drop-zone-content">
-                <span class="drop-icon"></span>
+            <!-- Показываем контент только если файл НЕ загружен -->
+            <div class="drop-zone-content" {% if uploaded_file_name %}style="display:none;"{% endif %}>
+                <span class="drop-icon">📄</span>
                 <span class="drop-title">Drag & drop file here</span>
-                <span class="drop-subtitle">Supports .txt and .pdf</span>
-            </div>
-    
-            <!-- Кнопка удаления файла (появляется когда файл выбран) -->
-            <div id="file_name" class="file-selected">
+                <span class="drop-subtitle">.txt / .pdf</span>
+            </div>       
+
+            <!-- Показываем имя файла если он загружен -->
+            <div id="file_name" class="file-selected" {% if not uploaded_file_name %}style="display:none;"{% endif %}>
                 <span class="file-icon">✅</span>
-                <span class="file-name-text"></span>
+                <span class="file-name-text">{{ uploaded_file_name|default:"" }}</span>
                 <button type="button" class="file-remove" id="file-remove" title="Remove file">×</button>
             </div>
-        </div>        
+        </div>
 
 
         <!-- Текстовое поле -->
@@ -266,10 +267,38 @@ function clearAll() {
 
 // Функция очистки текста
 function cleanText() {
-    const textarea = document.querySelector('textarea');
-    // 1. Убираем пробелы в начале и конце
-    // 2. Заменяем ВСЕ группы из нескольких пробелов на ОДИН пробел
-    textarea.value = textarea.value.trim().replace(/\s+/g, ' ');
+    // === 1. Очищаем textarea (твоя старая логика) ===
+    const textarea = document.querySelector('textarea[name="texttocount"]');
+    if (textarea) {
+        textarea.value = textarea.value.trim().replace(/\s+/g, ' ');
+    }
+    
+    // === 2. 🔥 Очищаем загруженный файл ===
+    const fileInput = document.getElementById('text_file');
+    if (fileInput) {
+        fileInput.value = ''; // Сбрасываем input
+    }
+    
+    // === 3. 🔥 Переключаем видимость в зоне Drag & Drop ===
+    const fileNameDisplay = document.getElementById('file_name');
+    const dropZoneContent = document.querySelector('.drop-zone-content');
+    
+    if (fileNameDisplay) fileNameDisplay.style.display = 'none';
+    if (dropZoneContent) dropZoneContent.style.display = 'flex';
+    
+    // === 4. 🔥 Сбрасываем Live Stats ===
+    const liveWords = document.getElementById('live-word-count');
+    const liveChars = document.getElementById('live-char-count');
+    const liveUnique = document.getElementById('live-unique-count');
+    
+    if (liveWords) liveWords.textContent = '0';
+    if (liveChars) liveChars.textContent = '0';
+    if (liveUnique) liveUnique.textContent = '0';
+    
+    // === 5. Обновляем статистику (на случай если есть валидация пустоты) ===
+    if (typeof updateLiveStats === 'function') {
+        updateLiveStats();
+    }
 }
 
 
